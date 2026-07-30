@@ -1,49 +1,133 @@
 import 'package:flutter/material.dart';
-import 'package:kompas/design_system/components/compass_card.dart';
-import 'package:kompas/design_system/tokens/compass_spacing.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kompas/core/providers/use_case_providers.dart';
+import 'package:kompas/design_system/design_system.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
-import 'package:kompas/presentation/shell/app_shell.dart';
+import 'package:kompas/features/compass_engine/domain/usecases/start_session.dart';
+import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
+import 'package:kompas/features/profile/providers/profile_providers.dart';
+import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/services/compass/practice_mode_catalog.dart';
 
-/// Shell practice list — UI implementation is deferred.
-class PracticeScreen extends StatelessWidget {
+class PracticeScreen extends ConsumerWidget {
   const PracticeScreen({super.key});
 
+  Future<void> _start(
+    BuildContext context,
+    WidgetRef ref, {
+    PracticeMode? mode,
+    String? exerciseId,
+  }) async {
+    final user = await ref.read(activeUserProvider.future);
+    if (user == null || !context.mounted) return;
+    final result = await ref.read(startSessionProvider)(
+      StartSessionParams(
+        userId: user.id,
+        mode: mode,
+        exerciseId: exerciseId,
+      ),
+    );
+    if (!context.mounted) return;
+    result.fold(
+      onSuccess: (session) => context.push(AppRoutes.sessionPath(session.id)),
+      onFailure: (failure) =>
+          CompassSnackbars.show(context, message: failure.message),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recommended = ref.watch(recommendedExerciseProvider);
+    final strategy = ref.watch(learningStrategyProvider);
     final text = Theme.of(context).textTheme;
-    return ListView(
+
+    return CompassPageTemplate(
+      header: const CompassSectionHeader(
+        title: 'Practice',
+        subtitle: 'Local exercises from Compass Engine — no AI required',
+      ),
       children: [
-        const ShellHeader(
-          title: 'Practice',
-          subtitle: 'Guided by Compass Engine — offline in 0.1',
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: CompassSpacing.screenHorizontal,
+        CompassAppear(
+          child: recommended.when(
+            data: (exercise) {
+              if (exercise == null) {
+                return const CompassCard(
+                  child: Text('No exercise available yet.'),
+                );
+              }
+              final reason = strategy.maybeWhen(
+                data: (value) => value?.reasons.isNotEmpty == true
+                    ? value!.reasons.first.message
+                    : 'Recommended by Coach Engine',
+                orElse: () => 'Recommended by Coach Engine',
+              );
+              return CompassExerciseCard(
+                title: exercise.title,
+                subtitle: exercise.prompt,
+                meta: reason,
+                onTap: () => _start(
+                  context,
+                  ref,
+                  mode: exercise.mode,
+                  exerciseId: exercise.id,
+                ),
+                trailing: CompassPrimaryButton(
+                  label: 'Start',
+                  expanded: false,
+                  size: CompassButtonSize.compact,
+                  onPressed: () => _start(
+                    context,
+                    ref,
+                    mode: exercise.mode,
+                    exerciseId: exercise.id,
+                  ),
+                ),
+              );
+            },
+            loading: () => const LinearProgressIndicator(),
+            error: (error, _) => Text('$error'),
           ),
-          child: Column(
-            children: PracticeMode.values
-                .map(
-                  (mode) => Padding(
-                    padding: const EdgeInsets.only(bottom: CompassSpacing.sm),
-                    child: CompassCard(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Practice modes', style: text.titleLarge),
+            const SizedBox(height: CompassSpacing.md),
+            for (final mode in PracticeMode.values) ...[
+              CompassAppear(
+                delay: Duration(milliseconds: 40 * mode.index),
+                child: CompassCard(
+                  onTap: () => _start(context, ref, mode: mode),
+                  padding: const EdgeInsets.all(CompassSpacing.md),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
                               PracticeModeCatalog.title(mode),
                               style: text.titleMedium,
                             ),
-                          ),
-                          const Icon(Icons.chevron_right_rounded),
-                        ],
+                            const SizedBox(height: 2),
+                            Text(
+                              PracticeModeCatalog.defaultPrompt(mode),
+                              style: text.bodySmall,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      const Icon(CompassIcons.chevronRight),
+                    ],
                   ),
-                )
-                .toList(),
-          ),
+                ),
+              ),
+              const SizedBox(height: CompassSpacing.sm),
+            ],
+          ],
         ),
       ],
     );

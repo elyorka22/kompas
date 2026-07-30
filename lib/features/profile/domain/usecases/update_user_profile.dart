@@ -12,6 +12,7 @@ class UpdateUserProfileParams {
     this.nativeLanguage,
     this.targetLanguage,
     this.dailySpeakingGoalMinutes,
+    this.learningGoal,
   });
 
   final User user;
@@ -19,6 +20,7 @@ class UpdateUserProfileParams {
   final AppLanguage? nativeLanguage;
   final AppLanguage? targetLanguage;
   final int? dailySpeakingGoalMinutes;
+  final String? learningGoal;
 }
 
 class UpdateUserProfile extends UseCase<User, UpdateUserProfileParams> {
@@ -33,6 +35,7 @@ class UpdateUserProfile extends UseCase<User, UpdateUserProfileParams> {
       nativeLanguage: params.nativeLanguage,
       targetLanguage: params.targetLanguage,
       dailySpeakingGoalMinutes: params.dailySpeakingGoalMinutes,
+      learningGoal: params.learningGoal,
       updatedAt: DateTime.now().toUtc(),
     );
     if (updated.displayName.trim().isEmpty) {

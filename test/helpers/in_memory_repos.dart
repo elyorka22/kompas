@@ -7,6 +7,7 @@ import 'package:kompas/domain/entities/daily_plan.dart';
 import 'package:kompas/domain/entities/exercise_history_entry.dart';
 import 'package:kompas/domain/entities/expression.dart';
 import 'package:kompas/domain/entities/learning_path.dart';
+import 'package:kompas/domain/entities/app_settings.dart';
 import 'package:kompas/domain/entities/skill.dart';
 import 'package:kompas/domain/entities/skill_progress.dart';
 import 'package:kompas/domain/entities/user.dart';
@@ -18,6 +19,7 @@ import 'package:kompas/domain/repositories/daily_plan_repository.dart';
 import 'package:kompas/domain/repositories/exercise_history_repository.dart';
 import 'package:kompas/domain/repositories/expression_repository.dart';
 import 'package:kompas/domain/repositories/mission_repository.dart';
+import 'package:kompas/domain/repositories/settings_repository.dart';
 import 'package:kompas/domain/repositories/skill_repository.dart';
 import 'package:kompas/domain/repositories/statistics_repository.dart';
 import 'package:kompas/domain/repositories/user_repository.dart';
@@ -317,6 +319,25 @@ class InMemoryUserRepository implements UserRepository {
   Future<Result<void>> delete(String id) async {
     if (active?.id == id) active = null;
     return const Success(null);
+  }
+}
+
+class InMemorySettingsRepository implements SettingsRepository {
+  AppSettings? value;
+
+  @override
+  Future<Result<AppSettings>> get() async {
+    value ??= AppSettings(
+      id: 'app_settings',
+      updatedAt: DateTime.utc(2026, 7, 30),
+    );
+    return Success(value!);
+  }
+
+  @override
+  Future<Result<AppSettings>> save(AppSettings settings) async {
+    value = settings;
+    return Success(settings);
   }
 }
 

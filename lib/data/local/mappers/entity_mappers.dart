@@ -16,6 +16,7 @@ abstract final class EntityMappers {
         targetLanguage: AppLanguage.fromCode(c.targetLanguageCode),
         onboardingCompleted: c.onboardingCompleted,
         dailySpeakingGoalMinutes: c.dailySpeakingGoalMinutes,
+        learningGoal: c.learningGoal,
         avatarSeed: c.avatarSeed,
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
@@ -30,6 +31,7 @@ abstract final class EntityMappers {
       ..targetLanguageCode = e.targetLanguage.code
       ..onboardingCompleted = e.onboardingCompleted
       ..dailySpeakingGoalMinutes = e.dailySpeakingGoalMinutes
+      ..learningGoal = e.learningGoal
       ..avatarSeed = e.avatarSeed
       ..createdAt = e.createdAt
       ..updatedAt = e.updatedAt;

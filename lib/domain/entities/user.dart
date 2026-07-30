@@ -12,6 +12,7 @@ class User extends Equatable {
     required this.updatedAt,
     this.onboardingCompleted = false,
     this.dailySpeakingGoalMinutes = 10,
+    this.learningGoal,
     this.avatarSeed,
   });
 
@@ -21,6 +22,7 @@ class User extends Equatable {
   final AppLanguage targetLanguage;
   final bool onboardingCompleted;
   final int dailySpeakingGoalMinutes;
+  final String? learningGoal;
   final String? avatarSeed;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -31,6 +33,7 @@ class User extends Equatable {
     AppLanguage? targetLanguage,
     bool? onboardingCompleted,
     int? dailySpeakingGoalMinutes,
+    String? learningGoal,
     String? avatarSeed,
     DateTime? updatedAt,
   }) {
@@ -42,6 +45,7 @@ class User extends Equatable {
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
       dailySpeakingGoalMinutes:
           dailySpeakingGoalMinutes ?? this.dailySpeakingGoalMinutes,
+      learningGoal: learningGoal ?? this.learningGoal,
       avatarSeed: avatarSeed ?? this.avatarSeed,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -56,6 +60,7 @@ class User extends Equatable {
         targetLanguage,
         onboardingCompleted,
         dailySpeakingGoalMinutes,
+        learningGoal,
         avatarSeed,
         createdAt,
         updatedAt,

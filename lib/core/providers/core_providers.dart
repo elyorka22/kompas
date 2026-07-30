@@ -123,7 +123,11 @@ final compassEngineServiceProvider = Provider<CompassEngineService>((ref) {
 });
 
 final memoryEngineServiceProvider = Provider<MemoryEngineService>((ref) {
-  return MemoryEngineService();
+  return MemoryEngineService(
+    expressionRepository: ref.watch(expressionRepositoryProvider),
+    statisticsRepository: ref.watch(statisticsRepositoryProvider),
+    progressCalculator: ref.watch(progressCalculatorServiceProvider),
+  );
 });
 
 final learnerContextLoaderProvider = Provider<LearnerContextLoader>((ref) {

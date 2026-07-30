@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kompas/design_system/icons/compass_mark.dart';
-import 'package:kompas/design_system/tokens/compass_spacing.dart';
+import 'package:kompas/design_system/design_system.dart';
 import 'package:kompas/navigation/app_routes.dart';
 
 class AppShell extends StatelessWidget {
@@ -13,41 +12,16 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: CompassBottomNavigation(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: navigationShell.goBranch,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.mic_none_rounded),
-            selectedIcon: Icon(Icons.mic_rounded),
-            label: 'Practice',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.menu_book_outlined),
-            selectedIcon: Icon(Icons.menu_book_rounded),
-            label: 'Notebook',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.account_tree_outlined),
-            selectedIcon: Icon(Icons.account_tree_rounded),
-            label: 'Skills',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            selectedIcon: Icon(Icons.insights_rounded),
-            label: 'Progress',
-          ),
-        ],
+        destinations: CompassNavDestinations.primary,
       ),
     );
   }
 }
 
+/// Shared page header used by shell tab screens.
 class ShellHeader extends StatelessWidget {
   const ShellHeader({
     super.key,
@@ -83,15 +57,14 @@ class ShellHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: text.headlineMedium),
-                if (subtitle != null)
-                  Text(subtitle!, style: text.bodyMedium),
+                if (subtitle != null) Text(subtitle!, style: text.bodyMedium),
               ],
             ),
           ),
           if (trailing != null) trailing!,
           IconButton(
             onPressed: () => context.push(AppRoutes.settings),
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(CompassIcons.settings),
           ),
         ],
       ),

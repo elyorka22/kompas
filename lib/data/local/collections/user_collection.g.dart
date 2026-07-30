@@ -42,23 +42,28 @@ const UserCollectionSchema = CollectionSchema(
       name: r'domainId',
       type: IsarType.string,
     ),
-    r'nativeLanguageCode': PropertySchema(
+    r'learningGoal': PropertySchema(
       id: 5,
+      name: r'learningGoal',
+      type: IsarType.string,
+    ),
+    r'nativeLanguageCode': PropertySchema(
+      id: 6,
       name: r'nativeLanguageCode',
       type: IsarType.string,
     ),
     r'onboardingCompleted': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'onboardingCompleted',
       type: IsarType.bool,
     ),
     r'targetLanguageCode': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'targetLanguageCode',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -105,6 +110,12 @@ int _userCollectionEstimateSize(
   }
   bytesCount += 3 + object.displayName.length * 3;
   bytesCount += 3 + object.domainId.length * 3;
+  {
+    final value = object.learningGoal;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.nativeLanguageCode.length * 3;
   bytesCount += 3 + object.targetLanguageCode.length * 3;
   return bytesCount;
@@ -121,10 +132,11 @@ void _userCollectionSerialize(
   writer.writeLong(offsets[2], object.dailySpeakingGoalMinutes);
   writer.writeString(offsets[3], object.displayName);
   writer.writeString(offsets[4], object.domainId);
-  writer.writeString(offsets[5], object.nativeLanguageCode);
-  writer.writeBool(offsets[6], object.onboardingCompleted);
-  writer.writeString(offsets[7], object.targetLanguageCode);
-  writer.writeDateTime(offsets[8], object.updatedAt);
+  writer.writeString(offsets[5], object.learningGoal);
+  writer.writeString(offsets[6], object.nativeLanguageCode);
+  writer.writeBool(offsets[7], object.onboardingCompleted);
+  writer.writeString(offsets[8], object.targetLanguageCode);
+  writer.writeDateTime(offsets[9], object.updatedAt);
 }
 
 UserCollection _userCollectionDeserialize(
@@ -140,10 +152,11 @@ UserCollection _userCollectionDeserialize(
   object.displayName = reader.readString(offsets[3]);
   object.domainId = reader.readString(offsets[4]);
   object.id = id;
-  object.nativeLanguageCode = reader.readString(offsets[5]);
-  object.onboardingCompleted = reader.readBool(offsets[6]);
-  object.targetLanguageCode = reader.readString(offsets[7]);
-  object.updatedAt = reader.readDateTime(offsets[8]);
+  object.learningGoal = reader.readStringOrNull(offsets[5]);
+  object.nativeLanguageCode = reader.readString(offsets[6]);
+  object.onboardingCompleted = reader.readBool(offsets[7]);
+  object.targetLanguageCode = reader.readString(offsets[8]);
+  object.updatedAt = reader.readDateTime(offsets[9]);
   return object;
 }
 
@@ -165,12 +178,14 @@ P _userCollectionDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
-    case 7:
       return (reader.readString(offset)) as P;
+    case 7:
+      return (reader.readBool(offset)) as P;
     case 8:
+      return (reader.readString(offset)) as P;
+    case 9:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -967,6 +982,160 @@ extension UserCollectionQueryFilter
   }
 
   QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'learningGoal',
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'learningGoal',
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'learningGoal',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'learningGoal',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'learningGoal',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'learningGoal',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'learningGoal',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'learningGoal',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'learningGoal',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'learningGoal',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'learningGoal',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
+      learningGoalIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'learningGoal',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterFilterCondition>
       nativeLanguageCodeEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1382,6 +1551,20 @@ extension UserCollectionQuerySortBy
   }
 
   QueryBuilder<UserCollection, UserCollection, QAfterSortBy>
+      sortByLearningGoal() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningGoal', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterSortBy>
+      sortByLearningGoalDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningGoal', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterSortBy>
       sortByNativeLanguageCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nativeLanguageCode', Sort.asc);
@@ -1520,6 +1703,20 @@ extension UserCollectionQuerySortThenBy
   }
 
   QueryBuilder<UserCollection, UserCollection, QAfterSortBy>
+      thenByLearningGoal() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningGoal', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterSortBy>
+      thenByLearningGoalDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'learningGoal', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QAfterSortBy>
       thenByNativeLanguageCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nativeLanguageCode', Sort.asc);
@@ -1613,6 +1810,13 @@ extension UserCollectionQueryWhereDistinct
   }
 
   QueryBuilder<UserCollection, UserCollection, QDistinct>
+      distinctByLearningGoal({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'learningGoal', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<UserCollection, UserCollection, QDistinct>
       distinctByNativeLanguageCode({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'nativeLanguageCode',
@@ -1679,6 +1883,13 @@ extension UserCollectionQueryProperty
   QueryBuilder<UserCollection, String, QQueryOperations> domainIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'domainId');
+    });
+  }
+
+  QueryBuilder<UserCollection, String?, QQueryOperations>
+      learningGoalProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'learningGoal');
     });
   }
 

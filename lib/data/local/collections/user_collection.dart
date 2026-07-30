@@ -14,6 +14,7 @@ class UserCollection {
   late String targetLanguageCode;
   late bool onboardingCompleted;
   late int dailySpeakingGoalMinutes;
+  String? learningGoal;
   String? avatarSeed;
   late DateTime createdAt;
   late DateTime updatedAt;

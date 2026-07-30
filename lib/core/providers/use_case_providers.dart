@@ -41,6 +41,7 @@ import 'package:kompas/features/speech_analyzer/domain/usecases/analyze_recordin
 final completeOnboardingProvider = Provider<CompleteOnboarding>((ref) {
   return CompleteOnboarding(
     userRepository: ref.watch(userRepositoryProvider),
+    settingsRepository: ref.watch(settingsRepositoryProvider),
     compassEngine: ref.watch(compassEngineServiceProvider),
   );
 });
