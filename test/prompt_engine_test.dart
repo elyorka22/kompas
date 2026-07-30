@@ -221,18 +221,18 @@ void main() {
 
     test('buildFromCoach produces full bundle from strategy', () {
       final now = DateTime.utc(2026, 7, 30);
-      final strategy = LearningStrategy(
+      const strategy = LearningStrategy(
         dayKey: '2026-07-30',
         primaryMode: PracticeMode.defendOpinion,
-        prioritySkillIds: const [SkillIds.argumentation],
-        priorityExerciseIds: const ['ex_opinion_remote'],
+        prioritySkillIds: [SkillIds.argumentation],
+        priorityExerciseIds: ['ex_opinion_remote'],
         difficulty: ExerciseDifficulty.core,
         suggestedSpeakingSeconds: 120,
-        wordsToReview: const ['persuade'],
-        expressionsToPractice: const ['on the other hand'],
-        topicsToAvoid: const ['elections'],
+        wordsToReview: ['persuade'],
+        expressionsToPractice: ['on the other hand'],
+        topicsToAvoid: ['elections'],
         suggestedTopic: 'remote work',
-        reasons: const [
+        reasons: [
           RecommendationReason(
             code: 'weak_skill',
             message: 'Argumentation needs attention.',
@@ -249,12 +249,12 @@ void main() {
         strongestSkillIds: const [SkillIds.conversation],
         updatedAt: now,
       );
-      final goal = ConversationGoal(
+      const goal = ConversationGoal(
         title: 'Defend a viewpoint',
         prompt: 'Argue for or against remote work calmly.',
         mode: PracticeMode.defendOpinion,
         targetSpeakingSeconds: 120,
-        reasons: const [
+        reasons: [
           RecommendationReason(
             code: 'strategy_goal',
             message: 'Matches today strategy.',

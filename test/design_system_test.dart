@@ -40,9 +40,12 @@ void main() {
     final semantic = theme.extension<CompassSemanticColors>();
     expect(semantic, isNotNull);
     expect(semantic!.mutedForeground, CompassColors.darkMuted);
-    expect(CompassSemanticColors.of(
-      tester.element(find.byType(SizedBox)),
-    ).brandSoft, isNot(CompassSemanticColors.light.brandSoft));
+    expect(
+      CompassSemanticColors.of(
+        tester.element(find.byType(SizedBox)),
+      ).brandSoft,
+      isNot(CompassSemanticColors.light.brandSoft),
+    );
   });
 
   testWidgets('core components render without exceptions', (tester) async {
