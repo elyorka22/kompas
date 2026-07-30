@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kompas/core/constants/app_constants.dart';
 import 'package:kompas/core/providers/use_case_providers.dart';
 import 'package:kompas/design_system/design_system.dart';
 import 'package:kompas/domain/enums/app_language.dart';
 import 'package:kompas/features/onboarding/domain/usecases/complete_onboarding.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
+import 'package:kompas/features/settings/providers/settings_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
-
-const _goals = <String>[
-  'Speak confidently at work',
-  'Travel with ease',
-  'Everyday conversations',
-  'Study and academic speech',
-];
 
 const _practiceMinutes = <int>[5, 10, 15, 20, 30];
 
@@ -32,13 +26,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _page = 0;
   AppLanguage _native = AppLanguage.ru;
   AppLanguage _target = AppLanguage.en;
-  String _goal = _goals.first;
+  String _goalKey = KompasL10n.goalKeyWork;
   int _minutes = 10;
   bool _reminders = true;
   bool _saving = false;
   String? _error;
 
-  static const _totalPages = 5; // 3 intro + profile + preferences
+  static const _totalPages = 5;
 
   @override
   void dispose() {
@@ -56,6 +50,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 
+  Future<void> _setInterfaceLanguage(AppLanguage language) async {
+    final settings = await ref.read(appSettingsProvider.future);
+    final next = settings.copyWith(
+      interfaceLanguage: InterfaceLanguages.normalize(language),
+      updatedAt: DateTime.now().toUtc(),
+    );
+    await ref.read(updateSettingsProvider)(next);
+    ref.invalidate(appSettingsProvider);
+  }
+
   Future<void> _submit() async {
     setState(() {
       _saving = true;
@@ -66,7 +70,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         displayName: _nameController.text,
         nativeLanguage: _native,
         targetLanguage: _target,
-        learningGoal: _goal,
+        learningGoal: _goalKey,
         dailySpeakingGoalMinutes: _minutes,
         dailyReminderEnabled: _reminders,
         dailyReminderHour: 9,
@@ -89,9 +93,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = KompasL10n.of(context);
+    final interfaceLanguage = ref.watch(interfaceLanguageProvider);
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
+      backgroundColor: Colors.transparent,
+      body: CompassAtmosphere(
+        child: SafeArea(
+          child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
@@ -100,7 +109,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 CompassSpacing.screenHorizontal,
                 0,
               ),
-              child: _StepIndicator(current: _page, total: _totalPages),
+              child: Column(
+                children: [
+                  _StepIndicator(current: _page, total: _totalPages),
+                  const SizedBox(height: CompassSpacing.sm),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SegmentedButton<AppLanguage>(
+                      style: const ButtonStyle(
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      segments: [
+                        for (final language in InterfaceLanguages.options)
+                          ButtonSegment(
+                            value: language,
+                            label: Text(language.nativeName),
+                          ),
+                      ],
+                      selected: {interfaceLanguage},
+                      onSelectionChanged: (selection) {
+                        _setInterfaceLanguage(selection.first);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: PageView(
@@ -110,27 +143,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 children: [
                   _IntroPage(
                     kind: CompassIllustrationKind.orbit,
-                    title: AppConstants.appName,
-                    body:
-                        'Compass doesn’t teach for you.\nCompass guides your journey.',
-                    actionLabel: 'Continue',
+                    title: l10n.appName,
+                    body: l10n.onboardingPhilosophy,
+                    actionLabel: l10n.continueLabel,
                     onAction: () => _goTo(1),
                   ),
                   _IntroPage(
                     kind: CompassIllustrationKind.path,
-                    title: 'Speak. Reflect. Grow.',
-                    body:
-                        'Daily missions, skill progress, and memory — all offline, all intentional.',
-                    actionLabel: 'Continue',
+                    title: l10n.onboardingSpeakReflect,
+                    body: l10n.onboardingSpeakReflectBody,
+                    actionLabel: l10n.continueLabel,
                     onBack: () => _goTo(0),
                     onAction: () => _goTo(2),
                   ),
                   _IntroPage(
                     kind: CompassIllustrationKind.horizon,
-                    title: 'A coach, not a game.',
-                    body:
-                        'Calm guidance. Real conversation practice. Premium focus — never childish drills.',
-                    actionLabel: 'Create profile',
+                    title: l10n.onboardingCoachNotGame,
+                    body: l10n.onboardingCoachNotGameBody,
+                    actionLabel: l10n.createProfile,
                     onBack: () => _goTo(1),
                     onAction: () => _goTo(3),
                   ),
@@ -143,7 +173,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     onBack: () => _goTo(2),
                     onNext: () {
                       if (_nameController.text.trim().isEmpty) {
-                        setState(() => _error = 'Please enter your name');
+                        setState(() => _error = l10n.pleaseEnterName);
                         return;
                       }
                       setState(() => _error = null);
@@ -152,12 +182,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     error: _page == 3 ? _error : null,
                   ),
                   _PreferencesPage(
-                    goal: _goal,
+                    goalKey: _goalKey,
                     minutes: _minutes,
                     reminders: _reminders,
                     saving: _saving,
                     error: _page == 4 ? _error : null,
-                    onGoal: (value) => setState(() => _goal = value),
+                    onGoal: (value) => setState(() => _goalKey = value),
                     onMinutes: (value) => setState(() => _minutes = value),
                     onReminders: (value) => setState(() => _reminders = value),
                     onBack: () => _goTo(3),
@@ -168,6 +198,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -188,10 +219,19 @@ class _StepIndicator extends StatelessWidget {
           Expanded(
             child: AnimatedContainer(
               duration: CompassMotion.fast,
-              height: 3,
+              height: 4,
               decoration: BoxDecoration(
+                gradient: i <= current
+                    ? const LinearGradient(
+                        colors: [
+                          CompassColors.compass,
+                          CompassColors.aurora,
+                          CompassColors.needle,
+                        ],
+                      )
+                    : null,
                 color: i <= current
-                    ? scheme.primary
+                    ? null
                     : scheme.outline.withOpacity(0.45),
                 borderRadius: BorderRadius.circular(CompassRadii.pill),
               ),
@@ -224,6 +264,7 @@ class _IntroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final l10n = KompasL10n.of(context);
     return CompassOnboardingTemplate(
       visual: CompassAppear(
         child: CompassIllustration(kind: kind, height: 180),
@@ -235,7 +276,7 @@ class _IntroPage extends StatelessWidget {
           CompassPrimaryButton(label: actionLabel, onPressed: onAction),
           if (onBack != null) ...[
             const SizedBox(height: CompassSpacing.sm),
-            CompassGhostButton(label: 'Back', onPressed: onBack),
+            CompassGhostButton(label: l10n.back, onPressed: onBack),
           ],
         ],
       ),
@@ -267,19 +308,20 @@ class _ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final l10n = KompasL10n.of(context);
     return CompassOnboardingTemplate(
       visual: const CompassMark(size: 56),
-      title: Text('Your profile', style: text.headlineLarge),
+      title: Text(l10n.yourProfile, style: text.headlineLarge),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CompassInput(
             controller: nameController,
-            label: 'Name',
-            hint: 'How should Compass address you?',
+            label: l10n.nameLabel,
+            hint: l10n.nameHint,
           ),
           const SizedBox(height: CompassSpacing.md),
-          Text('I speak', style: text.titleMedium),
+          Text(l10n.iSpeak, style: text.titleMedium),
           const SizedBox(height: CompassSpacing.xs),
           DropdownButtonFormField<AppLanguage>(
             value: native,
@@ -295,7 +337,7 @@ class _ProfilePage extends StatelessWidget {
             },
           ),
           const SizedBox(height: CompassSpacing.md),
-          Text('I want to speak', style: text.titleMedium),
+          Text(l10n.iWantToSpeak, style: text.titleMedium),
           const SizedBox(height: CompassSpacing.xs),
           DropdownButtonFormField<AppLanguage>(
             value: target,
@@ -323,9 +365,9 @@ class _ProfilePage extends StatelessWidget {
       ),
       actions: Column(
         children: [
-          CompassPrimaryButton(label: 'Continue', onPressed: onNext),
+          CompassPrimaryButton(label: l10n.continueLabel, onPressed: onNext),
           const SizedBox(height: CompassSpacing.sm),
-          CompassGhostButton(label: 'Back', onPressed: onBack),
+          CompassGhostButton(label: l10n.back, onPressed: onBack),
         ],
       ),
     );
@@ -334,7 +376,7 @@ class _ProfilePage extends StatelessWidget {
 
 class _PreferencesPage extends StatelessWidget {
   const _PreferencesPage({
-    required this.goal,
+    required this.goalKey,
     required this.minutes,
     required this.reminders,
     required this.saving,
@@ -346,7 +388,7 @@ class _PreferencesPage extends StatelessWidget {
     this.error,
   });
 
-  final String goal;
+  final String goalKey;
   final int minutes;
   final bool reminders;
   final bool saving;
@@ -360,35 +402,36 @@ class _PreferencesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final l10n = KompasL10n.of(context);
     return CompassOnboardingTemplate(
       visual: const CompassWidget(size: 72, animate: true),
-      title: Text('Your rhythm', style: text.headlineLarge),
+      title: Text(l10n.yourRhythm, style: text.headlineLarge),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Learning goal', style: text.titleMedium),
+          Text(l10n.learningGoal, style: text.titleMedium),
           const SizedBox(height: CompassSpacing.xs),
           Wrap(
             spacing: CompassSpacing.xs,
             runSpacing: CompassSpacing.xs,
             children: [
-              for (final item in _goals)
+              for (final item in l10n.learningGoals)
                 ChoiceChip(
-                  label: Text(item),
-                  selected: goal == item,
-                  onSelected: (_) => onGoal(item),
+                  label: Text(item.label),
+                  selected: goalKey == item.key,
+                  onSelected: (_) => onGoal(item.key),
                 ),
             ],
           ),
           const SizedBox(height: CompassSpacing.lg),
-          Text('Daily practice time', style: text.titleMedium),
+          Text(l10n.dailyPracticeTime, style: text.titleMedium),
           const SizedBox(height: CompassSpacing.xs),
           Wrap(
             spacing: CompassSpacing.xs,
             children: [
               for (final value in _practiceMinutes)
                 ChoiceChip(
-                  label: Text('$value min'),
+                  label: Text(l10n.minutesLabel(value)),
                   selected: minutes == value,
                   onSelected: (_) => onMinutes(value),
                 ),
@@ -397,8 +440,8 @@ class _PreferencesPage extends StatelessWidget {
           const SizedBox(height: CompassSpacing.lg),
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Daily practice reminder'),
-            subtitle: const Text('A quiet nudge at 09:00'),
+            title: Text(l10n.dailyReminder),
+            subtitle: Text(l10n.dailyReminderSubtitle),
             value: reminders,
             onChanged: onReminders,
           ),
@@ -416,11 +459,11 @@ class _PreferencesPage extends StatelessWidget {
       actions: Column(
         children: [
           CompassPrimaryButton(
-            label: saving ? 'Preparing Compass…' : 'Begin journey',
+            label: saving ? l10n.preparingCompass : l10n.beginJourney,
             onPressed: onSubmit,
           ),
           const SizedBox(height: CompassSpacing.sm),
-          CompassGhostButton(label: 'Back', onPressed: onBack),
+          CompassGhostButton(label: l10n.back, onPressed: onBack),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kompas/design_system/components/compass_card.dart';
 import 'package:kompas/design_system/tokens/compass_spacing.dart';
 import 'package:kompas/features/notebook/providers/notebook_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/presentation/shell/app_shell.dart';
 
 class NotebookScreen extends ConsumerWidget {
@@ -11,13 +12,14 @@ class NotebookScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(notebookItemsProvider);
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
 
     return ListView(
       children: [
-        const ShellHeader(
-          title: 'Notebook',
-          subtitle: 'Expressions, notes, and corrections',
+        ShellHeader(
+          title: l10n.notebookTitle,
+          subtitle: l10n.notebookSubtitle,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(
@@ -28,7 +30,7 @@ class NotebookScreen extends ConsumerWidget {
               if (list.isEmpty) {
                 return CompassCard(
                   child: Text(
-                    'Save phrases as you practice. Memory Engine will schedule reviews.',
+                    l10n.notebookEmpty,
                     style: text.bodyMedium,
                   ),
                 );

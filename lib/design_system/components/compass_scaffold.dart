@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kompas/core/constants/app_constants.dart';
+import 'package:kompas/design_system/foundation/compass_atmosphere.dart';
 import 'package:kompas/design_system/icons/compass_mark.dart';
 import 'package:kompas/design_system/tokens/compass_spacing.dart';
 
@@ -103,6 +104,7 @@ class CompassScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final showAppBar = title != null || showBrandInAppBar;
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: showAppBar
           ? CompassAppBar(
               title: title,
@@ -111,7 +113,9 @@ class CompassScaffold extends StatelessWidget {
               leading: leading,
             )
           : null,
-      body: SafeArea(child: body),
+      body: CompassAtmosphere(
+        child: SafeArea(child: body),
+      ),
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,
     );

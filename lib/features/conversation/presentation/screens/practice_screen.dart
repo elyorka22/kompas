@@ -7,6 +7,7 @@ import 'package:kompas/domain/enums/session_enums.dart';
 import 'package:kompas/features/compass_engine/domain/usecases/start_session.dart';
 import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/services/compass/practice_mode_catalog.dart';
 
@@ -40,27 +41,28 @@ class PracticeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final recommended = ref.watch(recommendedExerciseProvider);
     final strategy = ref.watch(learningStrategyProvider);
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
 
     return CompassPageTemplate(
-      header: const CompassSectionHeader(
-        title: 'Practice',
-        subtitle: 'Local exercises from Compass Engine — no AI required',
+      header: CompassSectionHeader(
+        title: l10n.practiceTitle,
+        subtitle: l10n.practiceSubtitle,
       ),
       children: [
         CompassAppear(
           child: recommended.when(
             data: (exercise) {
               if (exercise == null) {
-                return const CompassCard(
-                  child: Text('No exercise available yet.'),
+                return CompassCard(
+                  child: Text(l10n.noExerciseYet),
                 );
               }
               final reason = strategy.maybeWhen(
                 data: (value) => value?.reasons.isNotEmpty == true
                     ? value!.reasons.first.message
-                    : 'Recommended by Coach Engine',
-                orElse: () => 'Recommended by Coach Engine',
+                    : l10n.recommendedByCoach,
+                orElse: () => l10n.recommendedByCoach,
               );
               return CompassExerciseCard(
                 title: exercise.title,
@@ -73,7 +75,7 @@ class PracticeScreen extends ConsumerWidget {
                   exerciseId: exercise.id,
                 ),
                 trailing: CompassPrimaryButton(
-                  label: 'Start',
+                  label: l10n.start,
                   expanded: false,
                   size: CompassButtonSize.compact,
                   onPressed: () => _start(
@@ -92,7 +94,7 @@ class PracticeScreen extends ConsumerWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Practice modes', style: text.titleLarge),
+            Text(l10n.practiceModes, style: text.titleLarge),
             const SizedBox(height: CompassSpacing.md),
             for (final mode in PracticeMode.values) ...[
               CompassAppear(
@@ -107,7 +109,7 @@ class PracticeScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              PracticeModeCatalog.title(mode),
+                              l10n.practiceModeTitle(mode.name),
                               style: text.titleMedium,
                             ),
                             const SizedBox(height: 2),

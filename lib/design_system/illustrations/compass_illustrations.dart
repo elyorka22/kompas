@@ -45,7 +45,7 @@ class CompassIllustration extends StatelessWidget {
               accent: CompassColors.needle,
               wash: isDark
                   ? CompassColors.darkElevated
-                  : CompassColors.compassSoft.withOpacity(0.55),
+                  : CompassColors.auroraSoft.withOpacity(0.45),
               ink: isDark ? CompassColors.darkLine : CompassColors.line,
             ),
           ),
@@ -95,10 +95,15 @@ class _IllustrationPainter extends CustomPainter {
         Paint()
           ..color = primary.withOpacity(0.18 + i * 0.08)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.4,
+          ..strokeWidth = 1.6,
       );
     }
-    canvas.drawCircle(c, 6, Paint()..color = accent);
+    canvas.drawCircle(
+      Offset(size.width * 0.28, size.height * 0.3),
+      22,
+      Paint()..color = CompassColors.aurora.withOpacity(0.28),
+    );
+    canvas.drawCircle(c, 7, Paint()..color = accent);
   }
 
   void _paintHorizon(Canvas canvas, Size size) {

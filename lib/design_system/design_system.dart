@@ -8,6 +8,7 @@ export 'package:kompas/design_system/components/compass_inputs.dart';
 export 'package:kompas/design_system/components/compass_navigation.dart';
 export 'package:kompas/design_system/components/compass_progress.dart';
 export 'package:kompas/design_system/components/compass_scaffold.dart';
+export 'package:kompas/design_system/foundation/compass_atmosphere.dart';
 export 'package:kompas/design_system/foundation/compass_responsive.dart';
 export 'package:kompas/design_system/icons/compass_icons.dart';
 export 'package:kompas/design_system/icons/compass_mark.dart';

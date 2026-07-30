@@ -16,8 +16,8 @@ import 'package:kompas/features/daily_goals/providers/daily_goals_providers.dart
 import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/progress/providers/progress_providers.dart';
 import 'package:kompas/features/skill_tree/providers/skill_tree_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
-import 'package:kompas/services/compass/practice_mode_catalog.dart';
 import 'package:kompas/services/compass/skill_xp_rules.dart';
 
 class SessionScreen extends ConsumerStatefulWidget {
@@ -135,6 +135,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   Widget build(BuildContext context) {
     final sessionAsync = ref.watch(sessionByIdProvider(widget.sessionId));
     final messagesAsync = ref.watch(sessionMessagesProvider(widget.sessionId));
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
 
     return sessionAsync.when(
@@ -144,9 +145,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
       error: (error, _) => Scaffold(body: Center(child: Text('$error'))),
       data: (session) {
         if (session == null) {
-          return const Scaffold(
-            appBar: CompassAppBar(title: 'Session'),
-            body: Center(child: Text('Session not found')),
+          return Scaffold(
+            appBar: const CompassAppBar(title: 'Session'),
+            body: Center(child: Text(l10n.sessionNotFound)),
           );
         }
 
@@ -163,12 +164,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CompassBadge(
-                  label: PracticeModeCatalog.title(session.mode),
+                  label: l10n.practiceModeTitle(session.mode.name),
                   tone: CompassBadgeTone.brand,
                 ),
                 const SizedBox(height: CompassSpacing.sm),
                 Text(
-                  'Offline practice · earn ${SkillXpRules.sessionFinishXp} XP on finish',
+                  l10n.sessionEarnXp(SkillXpRules.sessionFinishXp),
                   style: text.bodySmall,
                 ),
               ],
@@ -180,7 +181,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Coach prompt', style: text.titleMedium),
+                        Text(l10n.coachPrompt, style: text.titleMedium),
                         const SizedBox(height: CompassSpacing.sm),
                         Text(session.prompt ?? '', style: text.bodyLarge),
                         const SizedBox(height: CompassSpacing.lg),
@@ -198,8 +199,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                             Expanded(
                               child: Text(
                                 _running
-                                    ? 'Speak aloud. Compass listens through your effort — not an AI mic.'
-                                    : 'Start the timer, speak for about two minutes, then finish.',
+                                    ? l10n.speakNow
+                                    : l10n.startTimerHint,
                                 style: text.bodyMedium,
                               ),
                             ),
@@ -219,7 +220,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Session notes', style: text.titleMedium),
+                        Text(l10n.sessionNotes, style: text.titleMedium),
                         const SizedBox(height: CompassSpacing.sm),
                         for (final message in coach)
                           Padding(
@@ -238,11 +239,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                   error: (_, __) => const SizedBox.shrink(),
                 ),
                 const SizedBox(height: CompassSpacing.md),
-                Text('Capture a phrase (optional)', style: text.titleMedium),
+                Text(l10n.capturePhrase, style: text.titleMedium),
                 const SizedBox(height: CompassSpacing.sm),
                 CompassInput(
                   controller: _noteController,
-                  hint: 'A sentence you practiced — saved to Memory Engine',
+                  hint: l10n.capturePhraseHint,
                   maxLines: 3,
                 ),
               ],
@@ -250,13 +251,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
             composer: Column(
               children: [
                 CompassSecondaryButton(
-                  label: _running ? 'Pause timer' : 'Start speaking timer',
+                  label: _running ? l10n.pauseTimer : l10n.startSpeakingTimer,
                   icon: _running ? Icons.pause_rounded : CompassIcons.practice,
                   onPressed: _finishing ? null : _toggleTimer,
                 ),
                 const SizedBox(height: CompassSpacing.sm),
                 CompassPrimaryButton(
-                  label: _finishing ? 'Saving…' : 'Finish session',
+                  label: _finishing ? l10n.saving : l10n.finishSession,
                   onPressed: _finishing ? null : _finish,
                 ),
               ],

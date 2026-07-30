@@ -2,10 +2,11 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:kompas/design_system/motion/compass_interactions.dart';
+import 'package:kompas/design_system/tokens/compass_colors.dart';
 import 'package:kompas/design_system/tokens/compass_radii.dart';
 import 'package:kompas/design_system/tokens/compass_spacing.dart';
 
-/// Animated circular progress ring.
+/// Animated circular progress ring with teal → aurora → coral sweep.
 class CompassProgressRing extends StatelessWidget {
   const CompassProgressRing({
     super.key,
@@ -14,6 +15,7 @@ class CompassProgressRing extends StatelessWidget {
     this.strokeWidth = 6,
     this.child,
     this.semanticLabel,
+    this.onDark = false,
   });
 
   /// 0.0 – 1.0
@@ -22,6 +24,9 @@ class CompassProgressRing extends StatelessWidget {
   final double strokeWidth;
   final Widget? child;
   final String? semanticLabel;
+
+  /// Use when ring sits on a vivid/dark hero surface.
+  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +43,21 @@ class CompassProgressRing extends StatelessWidget {
             child: CustomPaint(
               painter: _RingPainter(
                 progress: animated,
-                trackColor: scheme.outline.withOpacity(0.35),
-                progressColor: scheme.primary,
+                trackColor: onDark
+                    ? Colors.white.withOpacity(0.22)
+                    : scheme.outline.withOpacity(0.35),
                 strokeWidth: strokeWidth,
+                gradientColors: onDark
+                    ? const [
+                        Color(0xFFFFFFFF),
+                        Color(0xFFFFE0D4),
+                        Color(0xFFFF8A5C),
+                      ]
+                    : const [
+                        CompassColors.compassBright,
+                        CompassColors.aurora,
+                        CompassColors.needle,
+                      ],
               ),
               child: Center(child: child),
             ),
@@ -55,33 +72,45 @@ class _RingPainter extends CustomPainter {
   _RingPainter({
     required this.progress,
     required this.trackColor,
-    required this.progressColor,
     required this.strokeWidth,
+    required this.gradientColors,
   });
 
   final double progress;
   final Color trackColor;
-  final Color progressColor;
   final double strokeWidth;
+  final List<Color> gradientColors;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.shortestSide - strokeWidth) / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
     final track = Paint()
       ..color = trackColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
-    final fill = Paint()
-      ..color = progressColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, track);
+
+    if (progress <= 0) return;
+
+    final fill = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round
+      ..shader = SweepGradient(
+        startAngle: -math.pi / 2,
+        endAngle: 3 * math.pi / 2,
+        colors: gradientColors,
+        stops: const [0.0, 0.55, 1.0],
+        transform: const GradientRotation(-math.pi / 2),
+      ).createShader(rect);
+
     canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
+      rect,
       -math.pi / 2,
       2 * math.pi * progress,
       false,
@@ -92,12 +121,12 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RingPainter oldDelegate) {
     return oldDelegate.progress != progress ||
-        oldDelegate.progressColor != progressColor ||
-        oldDelegate.trackColor != trackColor;
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }
 
-/// Animated linear progress bar.
+/// Animated linear progress bar with brand gradient fill.
 class CompassProgressBar extends StatelessWidget {
   const CompassProgressBar({
     super.key,
@@ -125,10 +154,20 @@ class CompassProgressBar extends StatelessWidget {
               height: height,
               child: Stack(
                 children: [
-                  Container(color: scheme.outline.withOpacity(0.3)),
+                  Container(color: scheme.outline.withOpacity(0.28)),
                   FractionallySizedBox(
                     widthFactor: animated,
-                    child: Container(color: scheme.primary),
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            CompassColors.compass,
+                            CompassColors.aurora,
+                            CompassColors.needle,
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

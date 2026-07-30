@@ -39,18 +39,20 @@ class _CompassPressableState extends State<CompassPressable> {
   }
 }
 
-/// Card / list item entrance animation.
+/// Card / list item entrance animation with optional spring scale.
 class CompassAppear extends StatefulWidget {
   const CompassAppear({
     super.key,
     required this.child,
     this.delay = Duration.zero,
-    this.offset = const Offset(0, 0.03),
+    this.offset = const Offset(0, 0.045),
+    this.scale = true,
   });
 
   final Widget child;
   final Duration delay;
   final Offset offset;
+  final bool scale;
 
   @override
   State<CompassAppear> createState() => _CompassAppearState();
@@ -66,11 +68,11 @@ class _CompassAppearState extends State<CompassAppear>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: CompassMotion.normal,
+      duration: CompassMotion.slow,
     );
     _animation = CurvedAnimation(
       parent: _controller,
-      curve: CompassMotion.enter,
+      curve: widget.scale ? CompassMotion.springy : CompassMotion.enter,
     );
     Future<void>.delayed(widget.delay, () {
       if (mounted) _controller.forward();
@@ -85,10 +87,24 @@ class _CompassAppearState extends State<CompassAppear>
 
   @override
   Widget build(BuildContext context) {
-    return CompassMotion.fadeSlideIn(
-      animation: _animation,
-      begin: widget.offset,
-      child: widget.child,
+    return FadeTransition(
+      opacity: _animation,
+      child: SlideTransition(
+        position: Tween<Offset>(begin: widget.offset, end: Offset.zero).animate(
+          CurvedAnimation(parent: _controller, curve: CompassMotion.standard),
+        ),
+        child: widget.scale
+            ? ScaleTransition(
+                scale: Tween<double>(begin: 0.94, end: 1).animate(
+                  CurvedAnimation(
+                    parent: _controller,
+                    curve: CompassMotion.springy,
+                  ),
+                ),
+                child: widget.child,
+              )
+            : widget.child,
+      ),
     );
   }
 }

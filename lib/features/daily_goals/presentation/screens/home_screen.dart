@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kompas/core/constants/app_constants.dart';
 import 'package:kompas/core/providers/use_case_providers.dart';
 import 'package:kompas/design_system/design_system.dart';
 import 'package:kompas/domain/entities/daily_mission.dart';
@@ -11,8 +10,8 @@ import 'package:kompas/features/daily_goals/providers/daily_goals_providers.dart
 import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
 import 'package:kompas/features/progress/providers/progress_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
-import 'package:kompas/services/compass/practice_mode_catalog.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -54,11 +53,13 @@ class HomeScreen extends ConsumerWidget {
     final strategy = ref.watch(learningStrategyProvider);
     final skills = ref.watch(skillProgressViewsProvider);
     final recent = ref.watch(recentSessionsProvider);
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
 
     final greeting = user.maybeWhen(
-      data: (value) => value == null ? 'Welcome' : 'Hello, ${value.displayName}',
-      orElse: () => 'Welcome',
+      data: (value) =>
+          value == null ? l10n.welcome : l10n.helloName(value.displayName),
+      orElse: () => l10n.welcome,
     );
 
     final ringValue = completion.maybeWhen(
@@ -80,28 +81,32 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppConstants.appName, style: text.headlineMedium),
+                Text(l10n.appName, style: text.headlineMedium),
                 Text(greeting, style: text.bodyMedium),
               ],
             ),
           ),
           IconButton(
-            tooltip: 'Settings',
+            tooltip: l10n.settings,
             onPressed: () => context.push(AppRoutes.settings),
             icon: const Icon(CompassIcons.settings),
           ),
         ],
       ),
       hero: CompassAppear(
-        child: CompassCard.elevated(
+        child: CompassHeroPanel(
           child: Row(
             children: [
               CompassProgressRing(
                 value: ringValue,
                 size: 88,
+                onDark: true,
                 child: Text(
                   '${(ringValue * 100).round()}%',
-                  style: text.labelLarge,
+                  style: text.labelLarge?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(width: CompassSpacing.lg),
@@ -109,23 +114,45 @@ class HomeScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Today’s progress', style: text.titleLarge),
+                    Text(
+                      l10n.todaysProgress,
+                      style: text.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: CompassSpacing.xxs),
                     Text(
                       completion.maybeWhen(
                         data: (value) => value == null
-                            ? 'Missions load with Compass Engine'
-                            : '${value.completedMissions}/${value.totalMissions} missions',
-                        orElse: () => 'Loading…',
+                            ? l10n.missionsLoading
+                            : l10n.missionsCount(
+                                value.completedMissions,
+                                value.totalMissions,
+                              ),
+                        orElse: () => l10n.loading,
                       ),
-                      style: text.bodyMedium,
+                      style: text.bodyMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.9),
+                      ),
                     ),
                     const SizedBox(height: CompassSpacing.sm),
-                    CompassBadge(
-                      label: streak == 1
-                          ? '1 day streak'
-                          : '$streak day streak',
-                      tone: CompassBadgeTone.brand,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: CompassSpacing.sm,
+                        vertical: CompassSpacing.xxs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.22),
+                        borderRadius: BorderRadius.circular(CompassRadii.sm),
+                      ),
+                      child: Text(
+                        l10n.streakDays(streak),
+                        style: text.labelSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -139,18 +166,16 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CompassSectionHeader(
-              title: 'Today’s mission',
-              subtitle: 'Generated offline by Compass Engine',
+            CompassSectionHeader(
+              title: l10n.todaysMission,
+              subtitle: l10n.todaysMissionSubtitle,
             ),
             const SizedBox(height: CompassSpacing.md),
             missions.when(
               data: (items) {
                 if (items.isEmpty) {
-                  return const CompassCard(
-                    child: Text(
-                      'No missions yet. Start a practice session to begin.',
-                    ),
+                  return CompassCard(
+                    child: Text(l10n.noMissionsYet),
                   );
                 }
                 return Column(
@@ -178,7 +203,7 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CompassSectionHeader(title: 'Continue practice'),
+              CompassSectionHeader(title: l10n.continuePractice),
               const SizedBox(height: CompassSpacing.md),
               exercise.when(
                 data: (item) {
@@ -188,9 +213,8 @@ class HomeScreen extends ConsumerWidget {
                         strategy.maybeWhen(
                           data: (s) => s?.reasons.isNotEmpty == true
                               ? s!.reasons.first.message
-                              : 'Coach Engine will recommend your next exercise.',
-                          orElse: () =>
-                              'Coach Engine will recommend your next exercise.',
+                              : l10n.coachWillRecommend,
+                          orElse: () => l10n.coachWillRecommend,
                         ),
                       ),
                     );
@@ -199,7 +223,7 @@ class HomeScreen extends ConsumerWidget {
                     title: item.title,
                     subtitle: item.prompt,
                     meta:
-                        '${PracticeModeCatalog.title(item.mode)} · ${item.difficulty.name}',
+                        '${l10n.practiceModeTitle(item.mode.name)} · ${item.difficulty.name}',
                     onTap: () => _startPractice(
                       context,
                       ref,
@@ -214,7 +238,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: CompassSpacing.sm),
               CompassSecondaryButton(
-                label: 'Open practice',
+                label: l10n.openPractice,
                 onPressed: () => context.go(AppRoutes.practice),
               ),
             ],
@@ -226,17 +250,15 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CompassSectionHeader(
-                title: 'Notebook',
+                title: l10n.notebook,
                 action: CompassGhostButton(
-                  label: 'Open',
+                  label: l10n.open,
                   onPressed: () => context.go(AppRoutes.notebook),
                 ),
               ),
               const SizedBox(height: CompassSpacing.sm),
-              const CompassCard(
-                child: Text(
-                  'Save expressions from practice. Memory Engine keeps them for review.',
-                ),
+              CompassCard(
+                child: Text(l10n.notebookHomeHint),
               ),
             ],
           ),
@@ -246,15 +268,13 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CompassSectionHeader(title: 'Skill progress'),
+              CompassSectionHeader(title: l10n.skillProgress),
               const SizedBox(height: CompassSpacing.md),
               skills.when(
                 data: (views) {
                   if (views.isEmpty) {
-                    return const CompassCard(
-                      child: Text(
-                        'Skill XP appears after your first finished session.',
-                      ),
+                    return CompassCard(
+                      child: Text(l10n.skillXpAfterSession),
                     );
                   }
                   return Column(
@@ -282,15 +302,13 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CompassSectionHeader(title: 'Recent activity'),
+              CompassSectionHeader(title: l10n.recentActivity),
               const SizedBox(height: CompassSpacing.md),
               recent.when(
                 data: (sessions) {
                   if (sessions.isEmpty) {
-                    return const CompassCard(
-                      child: Text(
-                        'Finish a session to see your activity timeline.',
-                      ),
+                    return CompassCard(
+                      child: Text(l10n.finishSessionForActivity),
                     );
                   }
                   return Column(
@@ -306,7 +324,7 @@ class HomeScreen extends ConsumerWidget {
                                   children: [
                                     Text(session.title, style: text.titleSmall),
                                     Text(
-                                      '${PracticeModeCatalog.title(session.mode)} · ${session.speakingSeconds}s',
+                                      '${l10n.practiceModeTitle(session.mode.name)} · ${session.speakingSeconds}s',
                                       style: text.bodySmall,
                                     ),
                                   ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kompas/design_system/design_system.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
 
 class AppShell extends StatelessWidget {
@@ -10,12 +11,42 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = KompasL10n.of(context);
     return Scaffold(
-      body: navigationShell,
+      backgroundColor: Colors.transparent,
+      body: CompassAtmosphere(
+        child: navigationShell,
+      ),
       bottomNavigationBar: CompassBottomNavigation(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: navigationShell.goBranch,
-        destinations: CompassNavDestinations.primary,
+        destinations: [
+          CompassBottomDestination(
+            label: l10n.navHome,
+            icon: CompassIcons.home,
+            selectedIcon: CompassIcons.homeFilled,
+          ),
+          CompassBottomDestination(
+            label: l10n.navPractice,
+            icon: CompassIcons.practice,
+            selectedIcon: CompassIcons.practiceFilled,
+          ),
+          CompassBottomDestination(
+            label: l10n.navNotebook,
+            icon: CompassIcons.notebook,
+            selectedIcon: CompassIcons.notebookFilled,
+          ),
+          CompassBottomDestination(
+            label: l10n.navSkills,
+            icon: CompassIcons.skills,
+            selectedIcon: CompassIcons.skillsFilled,
+          ),
+          CompassBottomDestination(
+            label: l10n.navProgress,
+            icon: CompassIcons.progress,
+            selectedIcon: CompassIcons.progressFilled,
+          ),
+        ],
       ),
     );
   }
@@ -63,6 +94,7 @@ class ShellHeader extends StatelessWidget {
           ),
           if (trailing != null) trailing!,
           IconButton(
+            tooltip: KompasL10n.of(context).settings,
             onPressed: () => context.push(AppRoutes.settings),
             icon: const Icon(CompassIcons.settings),
           ),

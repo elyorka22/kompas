@@ -13,6 +13,7 @@ import 'package:kompas/features/profile/providers/profile_providers.dart';
 import 'package:kompas/features/progress/presentation/screens/progress_screen.dart';
 import 'package:kompas/features/settings/presentation/screens/settings_screen.dart';
 import 'package:kompas/features/skill_tree/presentation/screens/skill_tree_screen.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/presentation/shell/app_shell.dart';
 
@@ -179,23 +180,44 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
     return Scaffold(
-      body: Center(
-        child: FadeTransition(
-          opacity: CurvedAnimation(
-            parent: _controller,
-            curve: CompassMotion.standard,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CompassWidget(size: 96),
-              const SizedBox(height: CompassSpacing.lg),
-              Text('Kompas', style: text.headlineMedium),
-              const SizedBox(height: CompassSpacing.xs),
-              Text('Guiding your speaking journey', style: text.bodyMedium),
-            ],
+      backgroundColor: Colors.transparent,
+      body: CompassAtmosphere(
+        intensity: 1.2,
+        child: Center(
+          child: FadeTransition(
+            opacity: CurvedAnimation(
+              parent: _controller,
+              curve: CompassMotion.standard,
+            ),
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1).animate(
+                CurvedAnimation(
+                  parent: _controller,
+                  curve: CompassMotion.springy,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CompassPulse(
+                    child: CompassWidget(size: 112),
+                  ),
+                  const SizedBox(height: CompassSpacing.lg),
+                  Text(
+                    l10n.appName,
+                    style: text.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: CompassSpacing.xs),
+                  Text(l10n.splashTagline, style: text.bodyLarge),
+                ],
+              ),
+            ),
           ),
         ),
       ),

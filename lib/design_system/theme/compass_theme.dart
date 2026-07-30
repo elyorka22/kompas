@@ -18,8 +18,10 @@ abstract final class CompassTheme {
           onSecondary: CompassColors.white,
           secondaryContainer: CompassColors.needleSoft,
           onSecondaryContainer: CompassColors.ink,
-          tertiary: CompassColors.compassDeep,
+          tertiary: CompassColors.aurora,
           onTertiary: CompassColors.white,
+          tertiaryContainer: CompassColors.auroraSoft,
+          onTertiaryContainer: CompassColors.ink,
           surface: CompassColors.snow,
           onSurface: CompassColors.ink,
           onSurfaceVariant: CompassColors.slate,
@@ -45,8 +47,10 @@ abstract final class CompassTheme {
           onSecondary: CompassColors.white,
           secondaryContainer: Color(0xFF3A221C),
           onSecondaryContainer: CompassColors.needleSoft,
-          tertiary: CompassColors.compassBright,
+          tertiary: CompassColors.aurora,
           onTertiary: CompassColors.ink,
+          tertiaryContainer: Color(0xFF16324A),
+          onTertiaryContainer: CompassColors.auroraSoft,
           surface: CompassColors.darkCard,
           onSurface: CompassColors.darkText,
           onSurfaceVariant: CompassColors.darkMuted,
@@ -108,8 +112,9 @@ abstract final class CompassTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(CompassRadii.md),
           ),
-          textStyle: text.labelLarge,
+          textStyle: text.labelLarge?.copyWith(fontWeight: FontWeight.w600),
           elevation: 0,
+          shadowColor: scheme.primary.withOpacity(0.4),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -167,14 +172,16 @@ abstract final class CompassTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        height: 72,
+        height: 74,
         elevation: 0,
         backgroundColor: isDark ? CompassColors.darkCard : CompassColors.snow,
-        indicatorColor: scheme.primaryContainer,
+        indicatorColor: isDark
+            ? CompassColors.compassBright.withOpacity(0.22)
+            : CompassColors.compassSoft,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return text.labelSmall?.copyWith(
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             color: selected ? scheme.primary : scheme.onSurfaceVariant,
           );
         }),

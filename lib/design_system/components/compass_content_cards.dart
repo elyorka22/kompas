@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kompas/design_system/components/compass_card.dart';
 import 'package:kompas/design_system/components/compass_progress.dart';
+import 'package:kompas/design_system/foundation/compass_atmosphere.dart';
+import 'package:kompas/design_system/tokens/compass_colors.dart';
 import 'package:kompas/design_system/tokens/compass_radii.dart';
 import 'package:kompas/design_system/tokens/compass_semantic_colors.dart';
 import 'package:kompas/design_system/tokens/compass_spacing.dart';
@@ -128,12 +130,29 @@ class CompassExerciseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return CompassCard(
+    return CompassCard.elevated(
       onTap: onTap,
       semanticLabel: title,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 4,
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(99),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  CompassColors.compassBright,
+                  CompassColors.aurora,
+                  CompassColors.needle,
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: CompassSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,12 +198,14 @@ class CompassMissionCard extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final semantic = CompassSemanticColors.of(context);
 
-    return CompassCard(
+    return CompassCard.accent(
       onTap: onTap,
       semanticLabel: completed ? '$title completed' : title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const CompassAccentBar(),
+          const SizedBox(height: CompassSpacing.sm),
           Row(
             children: [
               Expanded(child: Text(title, style: text.titleMedium)),

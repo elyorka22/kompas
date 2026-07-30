@@ -5,6 +5,7 @@ import 'package:kompas/features/achievements/providers/achievements_providers.da
 import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/progress/providers/progress_providers.dart';
 import 'package:kompas/features/skill_tree/providers/skill_tree_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/shared/catalog/default_learning_path_catalog.dart';
 
 class ProgressScreen extends ConsumerWidget {
@@ -18,18 +19,19 @@ class ProgressScreen extends ConsumerWidget {
     final recent = ref.watch(recentSessionsProvider);
     final achievements = ref.watch(achievementsProvider);
     final tree = ref.watch(skillTreeProvider);
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
 
     return CompassProgressTemplate(
-      header: const CompassSectionHeader(
-        title: 'Progress',
-        subtitle: 'Real activity from Compass, Coach, and Memory engines',
+      header: CompassSectionHeader(
+        title: l10n.progressTitle,
+        subtitle: l10n.progressSubtitle,
       ),
       overview: stats.when(
         data: (value) {
           if (value == null) {
-            return const CompassCard(
-              child: Text('Complete a session to unlock progress.'),
+            return CompassCard(
+              child: Text(l10n.completeSessionForProgress),
             );
           }
           return CompassAppear(
@@ -39,7 +41,7 @@ class ProgressScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: CompassStatisticCard(
-                        label: 'Speaking',
+                        label: l10n.speaking,
                         value: '${value.totalSpeakingMinutes}m',
                         icon: CompassIcons.practice,
                       ),
@@ -47,9 +49,9 @@ class ProgressScreen extends ConsumerWidget {
                     const SizedBox(width: CompassSpacing.sm),
                     Expanded(
                       child: CompassStatisticCard(
-                        label: 'Streak',
+                        label: l10n.streak,
                         value: '${value.currentStreakDays}',
-                        caption: 'Best ${value.longestStreakDays}',
+                        caption: l10n.bestStreak(value.longestStreakDays),
                         icon: CompassIcons.streak,
                       ),
                     ),
@@ -60,7 +62,7 @@ class ProgressScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: CompassStatisticCard(
-                        label: 'Sessions',
+                        label: l10n.sessions,
                         value: '${value.completedSessions}',
                         icon: CompassIcons.progress,
                       ),
@@ -86,7 +88,7 @@ class ProgressScreen extends ConsumerWidget {
       charts: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CompassSectionHeader(title: 'Weekly activity'),
+          CompassSectionHeader(title: l10n.weeklyActivity),
           const SizedBox(height: CompassSpacing.md),
           recent.when(
             data: (sessions) {
@@ -101,7 +103,7 @@ class ProgressScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: CompassSpacing.md),
                       Text(
-                        'No completed sessions yet. Your weekly rhythm will appear here.',
+                        l10n.noWeeklyYet,
                         style: text.bodyMedium,
                       ),
                     ],
@@ -117,7 +119,10 @@ class ProgressScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${sessions.length} recent sessions · ${totalSeconds ~/ 60} minutes',
+                      l10n.recentSessionsSummary(
+                        sessions.length,
+                        totalSeconds ~/ 60,
+                      ),
                       style: text.titleMedium,
                     ),
                     const SizedBox(height: CompassSpacing.md),
@@ -126,7 +131,7 @@ class ProgressScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: CompassSpacing.sm),
                     Text(
-                      'Toward a steady weekly speaking cadence',
+                      l10n.towardWeeklyCadence,
                       style: text.bodySmall,
                     ),
                   ],
@@ -141,13 +146,13 @@ class ProgressScreen extends ConsumerWidget {
       details: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CompassSectionHeader(title: 'Skills'),
+          CompassSectionHeader(title: l10n.skills),
           const SizedBox(height: CompassSpacing.md),
           skills.when(
             data: (views) {
               if (views.isEmpty) {
-                return const CompassCard(
-                  child: Text('Skill growth starts after your first session.'),
+                return CompassCard(
+                  child: Text(l10n.skillGrowthStarts),
                 );
               }
               return Column(
@@ -168,7 +173,7 @@ class ProgressScreen extends ConsumerWidget {
             error: (error, _) => Text('$error'),
           ),
           const SizedBox(height: CompassSpacing.xl),
-          const CompassSectionHeader(title: 'Learning path'),
+          CompassSectionHeader(title: l10n.learningPath),
           const SizedBox(height: CompassSpacing.md),
           tree.when(
             data: (_) {
@@ -176,7 +181,7 @@ class ProgressScreen extends ConsumerWidget {
                   ? null
                   : DefaultLearningPathCatalog.paths.first;
               if (path == null) {
-                return const CompassCard(child: Text('Path unavailable'));
+                return CompassCard(child: Text(l10n.pathUnavailable));
               }
               return CompassCard(
                 child: Column(
@@ -187,7 +192,7 @@ class ProgressScreen extends ConsumerWidget {
                     Text(path.description, style: text.bodyMedium),
                     const SizedBox(height: CompassSpacing.md),
                     Text(
-                      '${path.skillIds.length} skills on this path',
+                      l10n.skillsOnPath(path.skillIds.length),
                       style: text.labelMedium,
                     ),
                   ],
@@ -198,15 +203,13 @@ class ProgressScreen extends ConsumerWidget {
             error: (error, _) => Text('$error'),
           ),
           const SizedBox(height: CompassSpacing.xl),
-          const CompassSectionHeader(title: 'Achievements'),
+          CompassSectionHeader(title: l10n.achievements),
           const SizedBox(height: CompassSpacing.md),
           achievements.when(
             data: (snapshot) {
               if (snapshot == null || snapshot.catalog.isEmpty) {
-                return const CompassCard(
-                  child: Text(
-                    'Achievements unlock as you practice — none yet.',
-                  ),
+                return CompassCard(
+                  child: Text(l10n.achievementsEmpty),
                 );
               }
               final unlockedIds = {
@@ -224,8 +227,8 @@ class ProgressScreen extends ConsumerWidget {
                           ),
                           CompassBadge(
                             label: unlockedIds.contains(item.id)
-                                ? 'Unlocked'
-                                : 'Locked',
+                                ? l10n.unlocked
+                                : l10n.locked,
                             tone: unlockedIds.contains(item.id)
                                 ? CompassBadgeTone.success
                                 : CompassBadgeTone.neutral,
@@ -242,7 +245,7 @@ class ProgressScreen extends ConsumerWidget {
             error: (error, _) => Text('$error'),
           ),
           const SizedBox(height: CompassSpacing.xl),
-          const CompassSectionHeader(title: 'Memory insights'),
+          CompassSectionHeader(title: l10n.memoryInsights),
           const SizedBox(height: CompassSpacing.md),
           insights.when(
             data: (lines) {

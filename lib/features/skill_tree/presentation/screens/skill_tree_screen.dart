@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kompas/design_system/components/compass_card.dart';
 import 'package:kompas/design_system/tokens/compass_spacing.dart';
 import 'package:kompas/features/skill_tree/providers/skill_tree_providers.dart';
+import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/presentation/shell/app_shell.dart';
 
 class SkillTreeScreen extends ConsumerWidget {
@@ -11,13 +12,14 @@ class SkillTreeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tree = ref.watch(skillTreeProvider);
+    final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
 
     return ListView(
       children: [
-        const ShellHeader(
-          title: 'Skill Tree',
-          subtitle: 'Speaking abilities that compound over time',
+        ShellHeader(
+          title: l10n.skillTreeTitle,
+          subtitle: l10n.skillTreeSubtitle,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(
@@ -28,7 +30,7 @@ class SkillTreeScreen extends ConsumerWidget {
               if (snapshot == null) {
                 return CompassCard(
                   child: Text(
-                    'Complete onboarding to unlock your path.',
+                    l10n.completeOnboardingForPath,
                     style: text.bodyMedium,
                   ),
                 );
