@@ -29,3 +29,47 @@ jobs:
 
       - name: Test
         run: flutter test
+
+  build-android:
+    needs: analyze-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.3"
+          channel: "stable"
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          flutter config --no-analytics
+          flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kompas-android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+
+      - name: Where to install
+        run: |
+          echo "## Install Kompas" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "1. Open this workflow run on GitHub Actions." >> "$GITHUB_STEP_SUMMARY"
+          echo "2. Scroll to **Artifacts**." >> "$GITHUB_STEP_SUMMARY"
+          echo "3. Download **kompas-android-apk**." >> "$GITHUB_STEP_SUMMARY"
+          echo "4. Unzip and install \`app-release.apk\` on your Android phone." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "GitHub does not show an Install button — use the Artifacts download." >> "$GITHUB_STEP_SUMMARY"
