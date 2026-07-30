@@ -7,9 +7,10 @@ class ProgressCalculatorService {
     required UserStatistics current,
     required int speakingSeconds,
     required bool sessionCompleted,
+    DateTime? now,
   }) {
-    final now = DateTime.now().toUtc();
-    final streak = _nextStreak(current, now);
+    final at = now ?? DateTime.now().toUtc();
+    final streak = calculateStreak(current: current, now: at);
 
     return current.copyWith(
       totalSpeakingSeconds: current.totalSpeakingSeconds + speakingSeconds,
@@ -18,8 +19,8 @@ class ProgressCalculatorService {
           current.completedSessions + (sessionCompleted ? 1 : 0),
       currentStreakDays: streak.current,
       longestStreakDays: streak.longest,
-      lastPracticeAt: now,
-      updatedAt: now,
+      lastPracticeAt: at,
+      updatedAt: at,
     );
   }
 
@@ -51,13 +52,15 @@ class ProgressCalculatorService {
     );
   }
 
-  ({int current, int longest}) _nextStreak(
-    UserStatistics current,
-    DateTime now,
-  ) {
+  /// Public streak calculation used by Compass Engine.
+  ({int current, int longest}) calculateStreak({
+    required UserStatistics current,
+    required DateTime now,
+  }) {
     final last = current.lastPracticeAt;
     if (last == null) {
-      return (current: 1, longest: current.longestStreakDays.clamp(1, 9999));
+      final longest = current.longestStreakDays < 1 ? 1 : current.longestStreakDays;
+      return (current: 1, longest: longest);
     }
 
     final days = KompasDateUtils.calendarDaysBetween(last, now);

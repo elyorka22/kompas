@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kompas/data/local/database/isar_database.dart';
 import 'package:kompas/data/repositories/isar_achievement_repository.dart';
 import 'package:kompas/data/repositories/isar_conversation_repository.dart';
+import 'package:kompas/data/repositories/isar_daily_plan_repository.dart';
+import 'package:kompas/data/repositories/isar_exercise_history_repository.dart';
 import 'package:kompas/data/repositories/isar_expression_repository.dart';
 import 'package:kompas/data/repositories/isar_mission_repository.dart';
 import 'package:kompas/data/repositories/isar_notebook_repository.dart';
@@ -13,10 +15,12 @@ import 'package:kompas/data/repositories/isar_user_repository.dart';
 import 'package:kompas/domain/repositories/repositories.dart';
 import 'package:kompas/features/ai_adapter/domain/ai_adapter.dart';
 import 'package:kompas/services/audio/audio_playback_service.dart';
+import 'package:kompas/services/coach/coach_engine_service.dart';
+import 'package:kompas/services/coach/learner_context_loader.dart';
 import 'package:kompas/services/compass/compass_engine_service.dart';
 import 'package:kompas/services/memory/memory_engine_service.dart';
-import 'package:kompas/services/missions/mission_generator_service.dart';
 import 'package:kompas/services/progress/progress_calculator_service.dart';
+import 'package:kompas/services/prompt/prompt_engine_service.dart';
 import 'package:kompas/services/speech/speech_analyzer_service.dart';
 import 'package:kompas/services/speech/speech_recording_service.dart';
 
@@ -88,16 +92,62 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   return IsarSettingsRepository(ref.watch(isarProvider));
 });
 
+final exerciseHistoryRepositoryProvider =
+    Provider<ExerciseHistoryRepository>((ref) {
+  return IsarExerciseHistoryRepository(ref.watch(isarProvider));
+});
+
+final dailyPlanRepositoryProvider = Provider<DailyPlanRepository>((ref) {
+  return IsarDailyPlanRepository(ref.watch(isarProvider));
+});
+
 // ── Services ────────────────────────────────────────────────────────────────
+
+final progressCalculatorServiceProvider =
+    Provider<ProgressCalculatorService>((ref) {
+  return ProgressCalculatorService();
+});
 
 final compassEngineServiceProvider = Provider<CompassEngineService>((ref) {
   return CompassEngineService(
     conversationRepository: ref.watch(conversationRepositoryProvider),
+    missionRepository: ref.watch(missionRepositoryProvider),
+    skillRepository: ref.watch(skillRepositoryProvider),
+    skillProgressRepository: ref.watch(skillProgressRepositoryProvider),
+    learningPathRepository: ref.watch(learningPathRepositoryProvider),
+    statisticsRepository: ref.watch(statisticsRepositoryProvider),
+    exerciseHistoryRepository: ref.watch(exerciseHistoryRepositoryProvider),
+    dailyPlanRepository: ref.watch(dailyPlanRepositoryProvider),
+    progressCalculator: ref.watch(progressCalculatorServiceProvider),
   );
 });
 
 final memoryEngineServiceProvider = Provider<MemoryEngineService>((ref) {
   return MemoryEngineService();
+});
+
+final learnerContextLoaderProvider = Provider<LearnerContextLoader>((ref) {
+  return LearnerContextLoader(
+    userRepository: ref.watch(userRepositoryProvider),
+    skillRepository: ref.watch(skillRepositoryProvider),
+    skillProgressRepository: ref.watch(skillProgressRepositoryProvider),
+    exerciseHistoryRepository: ref.watch(exerciseHistoryRepositoryProvider),
+    conversationRepository: ref.watch(conversationRepositoryProvider),
+    expressionRepository: ref.watch(expressionRepositoryProvider),
+    statisticsRepository: ref.watch(statisticsRepositoryProvider),
+    dailyPlanRepository: ref.watch(dailyPlanRepositoryProvider),
+    missionRepository: ref.watch(missionRepositoryProvider),
+  );
+});
+
+final coachEngineServiceProvider = Provider<CoachEngineService>((ref) {
+  return CoachEngineService(
+    contextLoader: ref.watch(learnerContextLoaderProvider),
+  );
+});
+
+final promptEngineServiceProvider = Provider<PromptEngineService>((ref) {
+  return const PromptEngineService();
 });
 
 final speechAnalyzerServiceProvider = Provider<SpeechAnalyzerService>((ref) {
@@ -111,16 +161,6 @@ final speechRecordingServiceProvider =
 
 final audioPlaybackServiceProvider = Provider<AudioPlaybackService>((ref) {
   return StubAudioPlaybackService();
-});
-
-final missionGeneratorServiceProvider =
-    Provider<MissionGeneratorService>((ref) {
-  return MissionGeneratorService();
-});
-
-final progressCalculatorServiceProvider =
-    Provider<ProgressCalculatorService>((ref) {
-  return ProgressCalculatorService();
 });
 
 final aiAdapterProvider = Provider<AiAdapter>((ref) {

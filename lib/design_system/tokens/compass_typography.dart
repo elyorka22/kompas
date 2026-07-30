@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kompas/design_system/tokens/compass_colors.dart';
 
-/// Large, calm typography inspired by Linear / Notion / Apple.
+/// Large, calm typography — Manrope (premium product, not schoolbook).
 abstract final class CompassTypography {
   static TextTheme textTheme(Brightness brightness) {
     final base = brightness == Brightness.dark
@@ -39,7 +39,8 @@ abstract final class CompassTypography {
       bodySmall: body.copyWith(fontSize: 13, color: muted),
       labelLarge: body.copyWith(fontSize: 14, fontWeight: FontWeight.w600),
       labelMedium: body.copyWith(fontSize: 12, fontWeight: FontWeight.w600),
-      labelSmall: body.copyWith(fontSize: 11, fontWeight: FontWeight.w500, color: muted),
+      labelSmall:
+          body.copyWith(fontSize: 11, fontWeight: FontWeight.w500, color: muted),
     );
   }
 }

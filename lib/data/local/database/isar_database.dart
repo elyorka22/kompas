@@ -29,6 +29,8 @@ class IsarDatabase {
         UserLearningPathCollectionSchema,
         SpeechAnalysisCollectionSchema,
         AppSettingsCollectionSchema,
+        ExerciseHistoryCollectionSchema,
+        DailyPlanCollectionSchema,
       ],
       directory: directory.path,
       name: AppConstants.databaseName,

@@ -3,7 +3,9 @@ import 'package:kompas/design_system/components/compass_card.dart';
 import 'package:kompas/design_system/tokens/compass_spacing.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
 import 'package:kompas/presentation/shell/app_shell.dart';
+import 'package:kompas/services/compass/practice_mode_catalog.dart';
 
+/// Shell practice list — UI implementation is deferred.
 class PracticeScreen extends StatelessWidget {
   const PracticeScreen({super.key});
 
@@ -21,7 +23,7 @@ class PracticeScreen extends StatelessWidget {
             horizontal: CompassSpacing.screenHorizontal,
           ),
           child: Column(
-            children: SessionMode.values
+            children: PracticeMode.values
                 .map(
                   (mode) => Padding(
                     padding: const EdgeInsets.only(bottom: CompassSpacing.sm),
@@ -30,7 +32,7 @@ class PracticeScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              _label(mode),
+                              PracticeModeCatalog.title(mode),
                               style: text.titleMedium,
                             ),
                           ),
@@ -45,16 +47,5 @@ class PracticeScreen extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _label(SessionMode mode) {
-    return switch (mode) {
-      SessionMode.freeTalk => 'Free talk',
-      SessionMode.storytelling => 'Storytelling',
-      SessionMode.argumentation => 'Argumentation',
-      SessionMode.explanation => 'Explanation',
-      SessionMode.speakingDrill => 'Speaking drill',
-      SessionMode.memoryReview => 'Memory review',
-    };
   }
 }

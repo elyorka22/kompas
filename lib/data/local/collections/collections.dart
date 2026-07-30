@@ -3,6 +3,8 @@ export 'app_settings_collection.dart';
 export 'conversation_message_collection.dart';
 export 'conversation_session_collection.dart';
 export 'daily_mission_collection.dart';
+export 'daily_plan_collection.dart';
+export 'exercise_history_collection.dart';
 export 'expression_collection.dart';
 export 'goal_collection.dart';
 export 'learning_path_collection.dart';

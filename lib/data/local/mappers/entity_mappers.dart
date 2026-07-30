@@ -41,15 +41,17 @@ abstract final class EntityMappers {
       ConversationSession(
         id: c.domainId,
         userId: c.userId,
-        mode: SessionMode.values.byName(c.mode),
+        mode: PracticeMode.values.byName(c.mode),
         status: SessionStatus.values.byName(c.status),
         title: c.title,
         prompt: c.prompt,
         targetSkillId: c.targetSkillId,
+        currentExerciseId: c.currentExerciseId,
         startedAt: c.startedAt,
         endedAt: c.endedAt,
         speakingSeconds: c.speakingSeconds,
         messageCount: c.messageCount,
+        exercisesCompleted: c.exercisesCompleted,
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
       );
@@ -67,10 +69,12 @@ abstract final class EntityMappers {
       ..title = e.title
       ..prompt = e.prompt
       ..targetSkillId = e.targetSkillId
+      ..currentExerciseId = e.currentExerciseId
       ..startedAt = e.startedAt
       ..endedAt = e.endedAt
       ..speakingSeconds = e.speakingSeconds
       ..messageCount = e.messageCount
+      ..exercisesCompleted = e.exercisesCompleted
       ..createdAt = e.createdAt
       ..updatedAt = e.updatedAt;
   }
@@ -116,6 +120,7 @@ abstract final class EntityMappers {
         order: c.order,
         prerequisiteSkillIds: List<String>.from(c.prerequisiteSkillIds),
         xpToMaster: c.xpToMaster,
+        isFuture: c.isFuture,
       );
 
   static SkillCollection fromSkill(Skill e, {int? isarId}) {
@@ -128,7 +133,8 @@ abstract final class EntityMappers {
       ..category = e.category.name
       ..order = e.order
       ..prerequisiteSkillIds = List<String>.from(e.prerequisiteSkillIds)
-      ..xpToMaster = e.xpToMaster;
+      ..xpToMaster = e.xpToMaster
+      ..isFuture = e.isFuture;
   }
 
   // ── SkillProgress ─────────────────────────────────────────────────────
@@ -519,5 +525,65 @@ abstract final class EntityMappers {
       ..autoSaveExpressions = e.autoSaveExpressions
       ..showCoachHints = e.showCoachHints
       ..updatedAt = e.updatedAt;
+  }
+
+  // ── ExerciseHistory ───────────────────────────────────────────────────
+
+  static ExerciseHistoryEntry toExerciseHistory(ExerciseHistoryCollection c) =>
+      ExerciseHistoryEntry(
+        id: c.domainId,
+        userId: c.userId,
+        exerciseId: c.exerciseId,
+        sessionId: c.sessionId,
+        mode: PracticeMode.values.byName(c.mode),
+        primarySkillId: c.primarySkillId,
+        xpEarned: c.xpEarned,
+        completedAt: c.completedAt,
+      );
+
+  static ExerciseHistoryCollection fromExerciseHistory(
+    ExerciseHistoryEntry e, {
+    int? isarId,
+  }) {
+    return ExerciseHistoryCollection()
+      ..id = isarId ?? Isar.autoIncrement
+      ..domainId = e.id
+      ..userId = e.userId
+      ..exerciseId = e.exerciseId
+      ..sessionId = e.sessionId
+      ..mode = e.mode.name
+      ..primarySkillId = e.primarySkillId
+      ..xpEarned = e.xpEarned
+      ..completedAt = e.completedAt;
+  }
+
+  // ── DailyPlan ─────────────────────────────────────────────────────────
+
+  static DailyPlan toDailyPlan(DailyPlanCollection c) => DailyPlan(
+        id: c.domainId,
+        userId: c.userId,
+        dayKey: c.dayKey,
+        missionIds: List<String>.from(c.missionIds),
+        recommendedExerciseIds: List<String>.from(c.recommendedExerciseIds),
+        preferredModes: c.preferredModes
+            .map(PracticeMode.values.byName)
+            .toList(),
+        focusSkillId: c.focusSkillId,
+        primaryMissionId: c.primaryMissionId,
+        createdAt: c.createdAt,
+      );
+
+  static DailyPlanCollection fromDailyPlan(DailyPlan e, {int? isarId}) {
+    return DailyPlanCollection()
+      ..id = isarId ?? Isar.autoIncrement
+      ..domainId = e.id
+      ..userId = e.userId
+      ..dayKey = e.dayKey
+      ..missionIds = List<String>.from(e.missionIds)
+      ..recommendedExerciseIds = List<String>.from(e.recommendedExerciseIds)
+      ..preferredModes = e.preferredModes.map((mode) => mode.name).toList()
+      ..focusSkillId = e.focusSkillId
+      ..primaryMissionId = e.primaryMissionId
+      ..createdAt = e.createdAt;
   }
 }

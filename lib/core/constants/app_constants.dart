@@ -6,11 +6,17 @@ abstract final class AppConstants {
 
   /// Local Isar database name. Bump schemaVersion when collections change.
   static const String databaseName = 'kompas';
-  static const int databaseSchemaVersion = 1;
+  static const int databaseSchemaVersion = 2;
 
   /// Default daily speaking target used before the user customizes goals.
   static const int defaultDailySpeakingMinutes = 10;
   static const int defaultDailyMissionCount = 3;
+
+  /// How many recent exercises are blocked from immediate repeat.
+  static const int exerciseRepeatBlockSize = 5;
+
+  /// Exercises queued in a generated daily plan.
+  static const int dailyPlanExerciseCount = 4;
 
   /// Memory Engine review batch size for a single practice session.
   static const int defaultReviewBatchSize = 8;

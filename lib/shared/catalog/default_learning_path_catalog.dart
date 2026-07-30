@@ -1,4 +1,5 @@
 import 'package:kompas/domain/entities/learning_path.dart';
+import 'package:kompas/shared/catalog/default_skill_catalog.dart';
 
 abstract final class DefaultLearningPathCatalog {
   static const List<LearningPath> paths = [
@@ -7,14 +8,17 @@ abstract final class DefaultLearningPathCatalog {
       code: 'speaker.core',
       title: 'Core speaker',
       description:
-          'Build fluency, vocabulary, storytelling and argumentation in sequence.',
+          'Conversation → natural speech → vocabulary → explanation → '
+          'descriptions → storytelling → argumentation → idioms.',
       skillIds: [
-        'skill_fluency_foundation',
-        'skill_pronunciation_clarity',
-        'skill_vocab_everyday',
-        'skill_story_structure',
-        'skill_argument_core',
-        'skill_confidence_presence',
+        SkillIds.conversation,
+        SkillIds.naturalSpeech,
+        SkillIds.vocabulary,
+        SkillIds.explanation,
+        SkillIds.descriptions,
+        SkillIds.storytelling,
+        SkillIds.argumentation,
+        SkillIds.idioms,
       ],
       isDefault: true,
     ),

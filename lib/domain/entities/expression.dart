@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:kompas/domain/enums/memory_enums.dart';
 
-/// Atomic phrase / chunk tracked by Memory Engine for recall practice.
+/// Atomic vocabulary / expression chunk tracked by Memory Engine.
 class Expression extends Equatable {
   const Expression({
     required this.id,
@@ -10,6 +10,7 @@ class Expression extends Equatable {
     required this.source,
     required this.createdAt,
     required this.updatedAt,
+    this.kind = VocabularyKind.expression,
     this.nativeText,
     this.phonetic,
     this.contextExample,
@@ -18,6 +19,7 @@ class Expression extends Equatable {
     this.easeFactor = 2.5,
     this.intervalDays = 0,
     this.repetitions = 0,
+    this.failCount = 0,
     this.nextReviewAt,
     this.lastReviewedAt,
   });
@@ -25,6 +27,7 @@ class Expression extends Equatable {
   final String id;
   final String userId;
   final String targetText;
+  final VocabularyKind kind;
   final String? nativeText;
   final String? phonetic;
   final String? contextExample;
@@ -34,13 +37,19 @@ class Expression extends Equatable {
   final double easeFactor;
   final int intervalDays;
   final int repetitions;
+  final int failCount;
   final DateTime? nextReviewAt;
   final DateTime? lastReviewedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  bool get isMastered => strength == MemoryStrength.mastered;
+  bool get needsReview =>
+      nextReviewAt == null || !nextReviewAt!.isAfter(DateTime.now().toUtc());
+
   Expression copyWith({
     String? targetText,
+    VocabularyKind? kind,
     String? nativeText,
     String? phonetic,
     String? contextExample,
@@ -49,6 +58,7 @@ class Expression extends Equatable {
     double? easeFactor,
     int? intervalDays,
     int? repetitions,
+    int? failCount,
     DateTime? nextReviewAt,
     DateTime? lastReviewedAt,
     DateTime? updatedAt,
@@ -57,6 +67,7 @@ class Expression extends Equatable {
       id: id,
       userId: userId,
       targetText: targetText ?? this.targetText,
+      kind: kind ?? this.kind,
       nativeText: nativeText ?? this.nativeText,
       phonetic: phonetic ?? this.phonetic,
       contextExample: contextExample ?? this.contextExample,
@@ -66,6 +77,7 @@ class Expression extends Equatable {
       easeFactor: easeFactor ?? this.easeFactor,
       intervalDays: intervalDays ?? this.intervalDays,
       repetitions: repetitions ?? this.repetitions,
+      failCount: failCount ?? this.failCount,
       nextReviewAt: nextReviewAt ?? this.nextReviewAt,
       lastReviewedAt: lastReviewedAt ?? this.lastReviewedAt,
       createdAt: createdAt,
@@ -78,6 +90,7 @@ class Expression extends Equatable {
         id,
         userId,
         targetText,
+        kind,
         nativeText,
         phonetic,
         contextExample,
@@ -87,6 +100,7 @@ class Expression extends Equatable {
         easeFactor,
         intervalDays,
         repetitions,
+        failCount,
         nextReviewAt,
         lastReviewedAt,
         createdAt,

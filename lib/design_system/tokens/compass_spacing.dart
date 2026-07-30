@@ -1,3 +1,4 @@
+/// Spacing scale — 4pt base.
 abstract final class CompassSpacing {
   static const double xxs = 4;
   static const double xs = 8;
@@ -7,7 +8,13 @@ abstract final class CompassSpacing {
   static const double xl = 32;
   static const double xxl = 48;
   static const double huge = 64;
+  static const double massive = 96;
 
   static const double screenHorizontal = 20;
   static const double screenTop = 16;
+  static const double sectionGap = 28;
+  static const double cardGap = 12;
+
+  /// Minimum interactive target (accessibility).
+  static const double touchTarget = 48;
 }

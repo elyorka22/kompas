@@ -29,7 +29,7 @@ class AiCoachRequest {
   });
 
   final String sessionId;
-  final SessionMode mode;
+  final PracticeMode mode;
   final String targetLanguageCode;
   final String nativeLanguageCode;
   final List<String> recentMessages;

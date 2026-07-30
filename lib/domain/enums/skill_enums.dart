@@ -1,13 +1,15 @@
 /// High-level speaking skill branches on the Skill Tree.
 enum SkillCategory {
-  fluency,
-  pronunciation,
-  vocabulary,
-  grammar,
-  storytelling,
+  conversation,
   argumentation,
+  storytelling,
+  vocabulary,
+  descriptions,
+  explanation,
+  idioms,
+  naturalSpeech,
   listening,
-  confidence,
+  pronunciation,
 }
 
 /// Unlock / mastery state of a skill node.

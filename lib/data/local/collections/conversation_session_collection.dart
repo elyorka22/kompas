@@ -17,10 +17,12 @@ class ConversationSessionCollection {
   late String title;
   String? prompt;
   String? targetSkillId;
+  String? currentExerciseId;
   DateTime? startedAt;
   DateTime? endedAt;
   late int speakingSeconds;
   late int messageCount;
+  late int exercisesCompleted;
   late DateTime createdAt;
   late DateTime updatedAt;
 }

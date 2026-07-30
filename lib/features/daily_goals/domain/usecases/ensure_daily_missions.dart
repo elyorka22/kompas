@@ -3,7 +3,7 @@ import 'package:kompas/core/usecase/use_case.dart';
 import 'package:kompas/core/utils/date_utils.dart';
 import 'package:kompas/domain/entities/daily_mission.dart';
 import 'package:kompas/domain/repositories/mission_repository.dart';
-import 'package:kompas/services/missions/mission_generator_service.dart';
+import 'package:kompas/services/compass/compass_engine_service.dart';
 
 class EnsureDailyMissionsParams {
   const EnsureDailyMissionsParams({
@@ -17,39 +17,33 @@ class EnsureDailyMissionsParams {
   final String? focusSkillId;
 }
 
+/// Ensures today's missions exist via Compass Engine daily plan generation.
 class EnsureDailyMissions
     extends UseCase<List<DailyMission>, EnsureDailyMissionsParams> {
   EnsureDailyMissions({
+    required CompassEngineService compassEngine,
     required MissionRepository missionRepository,
-    required MissionGeneratorService missionGenerator,
-  })  : _missions = missionRepository,
-        _generator = missionGenerator;
+  })  : _engine = compassEngine,
+        _missions = missionRepository;
 
+  final CompassEngineService _engine;
   final MissionRepository _missions;
-  final MissionGeneratorService _generator;
 
   @override
   Future<Result<List<DailyMission>>> call(
     EnsureDailyMissionsParams params,
   ) async {
     final day = params.date ?? DateTime.now();
-    final dayKey = KompasDateUtils.dayKey(day);
-    final existing = await _missions.listForDay(
-      userId: params.userId,
-      dayKey: dayKey,
-    );
-    if (existing.isFailure) return existing;
-    if (existing.valueOrNull!.isNotEmpty) return existing;
-
-    final generated = _generator.generateForDay(
+    final plan = await _engine.generateDailyPlan(
       userId: params.userId,
       date: day,
       focusSkillId: params.focusSkillId,
     );
-    final saved = await _missions.saveAll(generated);
-    if (saved.isFailure) {
-      return Err(saved.failureOrNull!);
-    }
-    return Success(generated);
+    if (plan.isFailure) return Err(plan.failureOrNull!);
+
+    return _missions.listForDay(
+      userId: params.userId,
+      dayKey: KompasDateUtils.dayKey(day),
+    );
   }
 }

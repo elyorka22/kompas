@@ -37,23 +37,28 @@ const SkillCollectionSchema = CollectionSchema(
       name: r'domainId',
       type: IsarType.string,
     ),
-    r'order': PropertySchema(
+    r'isFuture': PropertySchema(
       id: 4,
+      name: r'isFuture',
+      type: IsarType.bool,
+    ),
+    r'order': PropertySchema(
+      id: 5,
       name: r'order',
       type: IsarType.long,
     ),
     r'prerequisiteSkillIds': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'prerequisiteSkillIds',
       type: IsarType.stringList,
     ),
     r'title': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'title',
       type: IsarType.string,
     ),
     r'xpToMaster': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'xpToMaster',
       type: IsarType.long,
     )
@@ -130,10 +135,11 @@ void _skillCollectionSerialize(
   writer.writeString(offsets[1], object.code);
   writer.writeString(offsets[2], object.description);
   writer.writeString(offsets[3], object.domainId);
-  writer.writeLong(offsets[4], object.order);
-  writer.writeStringList(offsets[5], object.prerequisiteSkillIds);
-  writer.writeString(offsets[6], object.title);
-  writer.writeLong(offsets[7], object.xpToMaster);
+  writer.writeBool(offsets[4], object.isFuture);
+  writer.writeLong(offsets[5], object.order);
+  writer.writeStringList(offsets[6], object.prerequisiteSkillIds);
+  writer.writeString(offsets[7], object.title);
+  writer.writeLong(offsets[8], object.xpToMaster);
 }
 
 SkillCollection _skillCollectionDeserialize(
@@ -148,10 +154,11 @@ SkillCollection _skillCollectionDeserialize(
   object.description = reader.readString(offsets[2]);
   object.domainId = reader.readString(offsets[3]);
   object.id = id;
-  object.order = reader.readLong(offsets[4]);
-  object.prerequisiteSkillIds = reader.readStringList(offsets[5]) ?? [];
-  object.title = reader.readString(offsets[6]);
-  object.xpToMaster = reader.readLong(offsets[7]);
+  object.isFuture = reader.readBool(offsets[4]);
+  object.order = reader.readLong(offsets[5]);
+  object.prerequisiteSkillIds = reader.readStringList(offsets[6]) ?? [];
+  object.title = reader.readString(offsets[7]);
+  object.xpToMaster = reader.readLong(offsets[8]);
   return object;
 }
 
@@ -171,12 +178,14 @@ P _skillCollectionDeserializeProp<P>(
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 5:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1077,6 +1086,16 @@ extension SkillCollectionQueryFilter
   }
 
   QueryBuilder<SkillCollection, SkillCollection, QAfterFilterCondition>
+      isFutureEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isFuture',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SkillCollection, SkillCollection, QAfterFilterCondition>
       orderEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -1615,6 +1634,20 @@ extension SkillCollectionQuerySortBy
     });
   }
 
+  QueryBuilder<SkillCollection, SkillCollection, QAfterSortBy>
+      sortByIsFuture() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isFuture', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SkillCollection, SkillCollection, QAfterSortBy>
+      sortByIsFutureDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isFuture', Sort.desc);
+    });
+  }
+
   QueryBuilder<SkillCollection, SkillCollection, QAfterSortBy> sortByOrder() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'order', Sort.asc);
@@ -1725,6 +1758,20 @@ extension SkillCollectionQuerySortThenBy
     });
   }
 
+  QueryBuilder<SkillCollection, SkillCollection, QAfterSortBy>
+      thenByIsFuture() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isFuture', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SkillCollection, SkillCollection, QAfterSortBy>
+      thenByIsFutureDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isFuture', Sort.desc);
+    });
+  }
+
   QueryBuilder<SkillCollection, SkillCollection, QAfterSortBy> thenByOrder() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'order', Sort.asc);
@@ -1796,6 +1843,13 @@ extension SkillCollectionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<SkillCollection, SkillCollection, QDistinct>
+      distinctByIsFuture() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isFuture');
+    });
+  }
+
   QueryBuilder<SkillCollection, SkillCollection, QDistinct> distinctByOrder() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'order');
@@ -1854,6 +1908,12 @@ extension SkillCollectionQueryProperty
   QueryBuilder<SkillCollection, String, QQueryOperations> domainIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'domainId');
+    });
+  }
+
+  QueryBuilder<SkillCollection, bool, QQueryOperations> isFutureProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isFuture');
     });
   }
 

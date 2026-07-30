@@ -4,35 +4,35 @@ import 'package:kompas/domain/entities/conversation_session.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
 import 'package:kompas/services/compass/compass_engine_service.dart';
 
-class StartConversationSessionParams {
-  const StartConversationSessionParams({
+class StartSessionParams {
+  const StartSessionParams({
     required this.userId,
-    required this.mode,
+    this.mode,
+    this.exerciseId,
     this.title,
     this.prompt,
     this.targetSkillId,
   });
 
   final String userId;
-  final SessionMode mode;
+  final PracticeMode? mode;
+  final String? exerciseId;
   final String? title;
   final String? prompt;
   final String? targetSkillId;
 }
 
-class StartConversationSession
-    extends UseCase<ConversationSession, StartConversationSessionParams> {
-  StartConversationSession(this._engine);
+class StartSession extends UseCase<ConversationSession, StartSessionParams> {
+  StartSession(this._engine);
 
   final CompassEngineService _engine;
 
   @override
-  Future<Result<ConversationSession>> call(
-    StartConversationSessionParams params,
-  ) {
+  Future<Result<ConversationSession>> call(StartSessionParams params) {
     return _engine.startSession(
       userId: params.userId,
       mode: params.mode,
+      exerciseId: params.exerciseId,
       title: params.title,
       prompt: params.prompt,
       targetSkillId: params.targetSkillId,

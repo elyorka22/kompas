@@ -1,165 +1,245 @@
 import 'package:flutter/material.dart';
 import 'package:kompas/design_system/tokens/compass_colors.dart';
 import 'package:kompas/design_system/tokens/compass_radii.dart';
+import 'package:kompas/design_system/tokens/compass_semantic_colors.dart';
+import 'package:kompas/design_system/tokens/compass_spacing.dart';
 import 'package:kompas/design_system/tokens/compass_typography.dart';
 
+/// Material 3 theme factory for Compass Design System v1.
 abstract final class CompassTheme {
-  static ThemeData light() {
-    final text = CompassTypography.textTheme(Brightness.light);
-    const scheme = ColorScheme.light(
-      primary: CompassColors.compass,
-      onPrimary: Colors.white,
-      secondary: CompassColors.needle,
-      onSecondary: Colors.white,
-      surface: CompassColors.snow,
-      onSurface: CompassColors.ink,
-      error: CompassColors.danger,
-      outline: CompassColors.line,
-    );
+  static ThemeData light() => _build(
+        brightness: Brightness.light,
+        scheme: const ColorScheme.light(
+          primary: CompassColors.compass,
+          onPrimary: CompassColors.white,
+          primaryContainer: CompassColors.compassSoft,
+          onPrimaryContainer: CompassColors.compassDeep,
+          secondary: CompassColors.needle,
+          onSecondary: CompassColors.white,
+          secondaryContainer: CompassColors.needleSoft,
+          onSecondaryContainer: CompassColors.ink,
+          tertiary: CompassColors.compassDeep,
+          onTertiary: CompassColors.white,
+          surface: CompassColors.snow,
+          onSurface: CompassColors.ink,
+          onSurfaceVariant: CompassColors.slate,
+          surfaceContainerHighest: CompassColors.porcelain,
+          error: CompassColors.danger,
+          onError: CompassColors.white,
+          outline: CompassColors.line,
+          outlineVariant: Color(0xFFE6EBEF),
+          shadow: Color(0x1A111418),
+        ),
+        scaffold: CompassColors.porcelain,
+        semantic: CompassSemanticColors.light,
+      );
+
+  static ThemeData dark() => _build(
+        brightness: Brightness.dark,
+        scheme: const ColorScheme.dark(
+          primary: CompassColors.compassBright,
+          onPrimary: CompassColors.ink,
+          primaryContainer: Color(0xFF163838),
+          onPrimaryContainer: CompassColors.compassSoft,
+          secondary: CompassColors.needle,
+          onSecondary: CompassColors.white,
+          secondaryContainer: Color(0xFF3A221C),
+          onSecondaryContainer: CompassColors.needleSoft,
+          tertiary: CompassColors.compassBright,
+          onTertiary: CompassColors.ink,
+          surface: CompassColors.darkCard,
+          onSurface: CompassColors.darkText,
+          onSurfaceVariant: CompassColors.darkMuted,
+          surfaceContainerHighest: CompassColors.darkElevated,
+          error: Color(0xFFE06A5C),
+          onError: CompassColors.ink,
+          outline: CompassColors.darkLine,
+          outlineVariant: Color(0xFF222830),
+          shadow: Color(0x66000000),
+        ),
+        scaffold: CompassColors.darkSurface,
+        semantic: CompassSemanticColors.dark,
+      );
+
+  static ThemeData _build({
+    required Brightness brightness,
+    required ColorScheme scheme,
+    required Color scaffold,
+    required CompassSemanticColors semantic,
+  }) {
+    final text = CompassTypography.textTheme(brightness);
+    final isDark = brightness == Brightness.dark;
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor: CompassColors.porcelain,
+      scaffoldBackgroundColor: scaffold,
       textTheme: text,
+      visualDensity: VisualDensity.standard,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: text.headlineSmall,
-        foregroundColor: CompassColors.ink,
+        foregroundColor: scheme.onSurface,
+        iconTheme: IconThemeData(color: scheme.onSurface, size: 24),
       ),
       cardTheme: CardTheme(
-        color: CompassColors.snow,
+        color: scheme.surface,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(CompassRadii.lg),
-          side: const BorderSide(color: CompassColors.line),
+          side: BorderSide(color: scheme.outline.withOpacity(0.85)),
         ),
         margin: EdgeInsets.zero,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: CompassColors.compass,
-          foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(52),
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          disabledBackgroundColor: scheme.outline.withOpacity(0.35),
+          disabledForegroundColor: scheme.onSurface.withOpacity(0.4),
+          minimumSize: const Size(CompassSpacing.touchTarget, 52),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CompassRadii.md),
+          ),
+          textStyle: text.labelLarge,
+          elevation: 0,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          minimumSize: const Size(CompassSpacing.touchTarget, 52),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          side: BorderSide(color: scheme.outline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(CompassRadii.md),
           ),
           textStyle: text.labelLarge,
         ),
       ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: CompassColors.ink,
-          minimumSize: const Size.fromHeight(52),
-          side: const BorderSide(color: CompassColors.line),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CompassRadii.md),
-          ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: scheme.primary,
+          minimumSize: const Size(CompassSpacing.touchTarget, 44),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          textStyle: text.labelLarge,
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        elevation: 2,
+        focusElevation: 3,
+        hoverElevation: 3,
+        highlightElevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CompassRadii.lg),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: CompassColors.snow,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        fillColor: scheme.surface,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        hintStyle: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(CompassRadii.md),
-          borderSide: const BorderSide(color: CompassColors.line),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(CompassRadii.md),
-          borderSide: const BorderSide(color: CompassColors.line),
+          borderSide: BorderSide(color: scheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(CompassRadii.md),
-          borderSide: const BorderSide(color: CompassColors.compass, width: 1.4),
+          borderSide: BorderSide(color: scheme.primary, width: 1.4),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(CompassRadii.md),
+          borderSide: BorderSide(color: scheme.error),
         ),
       ),
-      dividerColor: CompassColors.line,
-      splashFactory: InkSparkle.splashFactory,
-    );
-  }
-
-  static ThemeData dark() {
-    final text = CompassTypography.textTheme(Brightness.dark);
-    const scheme = ColorScheme.dark(
-      primary: CompassColors.compassBright,
-      onPrimary: CompassColors.ink,
-      secondary: CompassColors.needle,
-      onSecondary: Colors.white,
-      surface: CompassColors.darkCard,
-      onSurface: CompassColors.darkText,
-      error: CompassColors.danger,
-      outline: CompassColors.darkLine,
-    );
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: scheme,
-      scaffoldBackgroundColor: CompassColors.darkSurface,
-      textTheme: text,
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+      navigationBarTheme: NavigationBarThemeData(
+        height: 72,
         elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
+        backgroundColor: isDark ? CompassColors.darkCard : CompassColors.snow,
+        indicatorColor: scheme.primaryContainer,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return text.labelSmall?.copyWith(
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            color: selected ? scheme.primary : scheme.onSurfaceVariant,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            size: 24,
+            color: selected ? scheme.primary : scheme.onSurfaceVariant,
+          );
+        }),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        showDragHandle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(CompassRadii.xl),
+          ),
+        ),
+      ),
+      dialogTheme: DialogTheme(
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CompassRadii.xl),
+        ),
         titleTextStyle: text.headlineSmall,
-        foregroundColor: CompassColors.darkText,
+        contentTextStyle: text.bodyMedium,
       ),
-      cardTheme: CardTheme(
-        color: CompassColors.darkCard,
-        elevation: 0,
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: isDark ? CompassColors.darkElevated : CompassColors.ink,
+        contentTextStyle: text.bodyMedium?.copyWith(
+          color: isDark ? CompassColors.darkText : CompassColors.snow,
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(CompassRadii.lg),
-          side: const BorderSide(color: CompassColors.darkLine),
-        ),
-        margin: EdgeInsets.zero,
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: CompassColors.compassBright,
-          foregroundColor: CompassColors.ink,
-          minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CompassRadii.md),
-          ),
-          textStyle: text.labelLarge,
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: CompassColors.darkText,
-          minimumSize: const Size.fromHeight(52),
-          side: const BorderSide(color: CompassColors.darkLine),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CompassRadii.md),
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: CompassColors.darkCard,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(CompassRadii.md),
-          borderSide: const BorderSide(color: CompassColors.darkLine),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(CompassRadii.md),
-          borderSide: const BorderSide(color: CompassColors.darkLine),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(CompassRadii.md),
-          borderSide:
-              const BorderSide(color: CompassColors.compassBright, width: 1.4),
-        ),
+        elevation: 2,
       ),
-      dividerColor: CompassColors.darkLine,
+      chipTheme: ChipThemeData(
+        backgroundColor: scheme.surfaceContainerHighest,
+        selectedColor: scheme.primaryContainer,
+        labelStyle: text.labelMedium!,
+        side: BorderSide(color: scheme.outline.withOpacity(0.6)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CompassRadii.sm),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      ),
+      dividerTheme: DividerThemeData(
+        color: scheme.outline.withOpacity(0.7),
+        thickness: 1,
+        space: 1,
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: scheme.primary,
+        linearTrackColor: scheme.outline.withOpacity(0.35),
+        circularTrackColor: scheme.outline.withOpacity(0.35),
+      ),
+      dividerColor: scheme.outline,
       splashFactory: InkSparkle.splashFactory,
+    ).copyWith(
+      extensions: <ThemeExtension<dynamic>>[semantic],
     );
   }
 }

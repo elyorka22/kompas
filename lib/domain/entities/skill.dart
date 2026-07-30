@@ -12,6 +12,7 @@ class Skill extends Equatable {
     required this.order,
     this.prerequisiteSkillIds = const [],
     this.xpToMaster = 100,
+    this.isFuture = false,
   });
 
   final String id;
@@ -23,6 +24,9 @@ class Skill extends Equatable {
   final List<String> prerequisiteSkillIds;
   final int xpToMaster;
 
+  /// Future skills stay locked until a later product version.
+  final bool isFuture;
+
   @override
   List<Object?> get props => [
         id,
@@ -33,5 +37,6 @@ class Skill extends Equatable {
         order,
         prerequisiteSkillIds,
         xpToMaster,
+        isFuture,
       ];
 }

@@ -5,8 +5,7 @@ import 'package:kompas/core/utils/id_generator.dart';
 import 'package:kompas/domain/entities/user.dart';
 import 'package:kompas/domain/enums/app_language.dart';
 import 'package:kompas/domain/repositories/user_repository.dart';
-import 'package:kompas/services/missions/mission_generator_service.dart';
-import 'package:kompas/domain/repositories/mission_repository.dart';
+import 'package:kompas/services/compass/compass_engine_service.dart';
 
 class CompleteOnboardingParams {
   const CompleteOnboardingParams({
@@ -20,20 +19,16 @@ class CompleteOnboardingParams {
   final AppLanguage targetLanguage;
 }
 
-/// Creates the local profile and first daily missions after onboarding.
-class CompleteOnboarding
-    extends UseCase<User, CompleteOnboardingParams> {
+/// Creates the local profile and first daily plan after onboarding.
+class CompleteOnboarding extends UseCase<User, CompleteOnboardingParams> {
   CompleteOnboarding({
     required UserRepository userRepository,
-    required MissionRepository missionRepository,
-    required MissionGeneratorService missionGenerator,
+    required CompassEngineService compassEngine,
   })  : _users = userRepository,
-        _missions = missionRepository,
-        _generator = missionGenerator;
+        _engine = compassEngine;
 
   final UserRepository _users;
-  final MissionRepository _missions;
-  final MissionGeneratorService _generator;
+  final CompassEngineService _engine;
 
   @override
   Future<Result<User>> call(CompleteOnboardingParams params) async {
@@ -61,10 +56,9 @@ class CompleteOnboarding
     final saved = await _users.save(user);
     if (saved.isFailure) return saved;
 
-    final missions = _generator.generateForDay(userId: user.id);
-    final missionResult = await _missions.saveAll(missions);
-    if (missionResult.isFailure) {
-      return Err(missionResult.failureOrNull!);
+    final plan = await _engine.generateDailyPlan(userId: user.id);
+    if (plan.isFailure) {
+      return Err(plan.failureOrNull!);
     }
 
     return Success(user);

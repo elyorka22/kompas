@@ -1,5 +1,7 @@
 export 'achievement_repository.dart';
 export 'conversation_repository.dart';
+export 'daily_plan_repository.dart';
+export 'exercise_history_repository.dart';
 export 'expression_repository.dart';
 export 'mission_repository.dart';
 export 'notebook_repository.dart';

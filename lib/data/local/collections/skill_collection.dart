@@ -18,4 +18,5 @@ class SkillCollection {
   late int order;
   late List<String> prerequisiteSkillIds;
   late int xpToMaster;
+  late bool isFuture;
 }
