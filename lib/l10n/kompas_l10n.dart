@@ -79,15 +79,15 @@ class KompasL10n {
   String get coachTyping =>
       _t(ru: 'Коуч печатает…', uz: 'Murabbiy yozmoqda…');
   String get openaiApiKey =>
-      _t(ru: 'OpenAI API ключ', uz: 'OpenAI API kaliti');
+      _t(ru: 'DeepSeek API ключ', uz: 'DeepSeek API kaliti');
   String get openaiApiKeyHint => _t(
-        ru: 'Ключ хранится только на этом устройстве',
-        uz: 'Kalit faqat shu qurilmada saqlanadi',
+        ru: 'Ключ DeepSeek хранится на устройстве. Телефон ходит к AI напрямую.',
+        uz: 'DeepSeek kaliti qurilmada saqlanadi. Telefon AI ga to‘g‘ridan-to‘g‘ri ulanadi.',
       );
   String get saveApiKey => _t(ru: 'Сохранить ключ', uz: 'Kalitni saqlash');
   String get apiKeySaved =>
       _t(ru: 'Ключ сохранён', uz: 'Kalit saqlandi');
-  String get aiSection => _t(ru: 'ИИ-коуч', uz: 'AI murabbiy');
+  String get aiSection => _t(ru: 'ИИ-коуч (DeepSeek)', uz: 'AI murabbiy (DeepSeek)');
 
   // ── Splash ────────────────────────────────────────────────────────────
   String get splashTagline => _t(

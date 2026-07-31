@@ -6,15 +6,15 @@ import 'package:kompas/core/errors/result.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
 import 'package:kompas/features/ai_adapter/domain/ai_adapter.dart';
 
-/// OpenAI Chat Completions adapter.
+/// OpenAI-compatible Chat Completions adapter (DeepSeek, OpenAI, etc.).
 ///
 /// Maps [PromptBundle] + conversation history into provider messages.
 /// Never invents pedagogy — Prompt Engine owns prompts.
 class OpenAiChatAdapter implements AiAdapter {
   OpenAiChatAdapter({
     required this.apiKey,
-    this.model = 'gpt-4o-mini',
-    this.baseUrl = 'https://api.openai.com/v1',
+    this.model = 'deepseek-chat',
+    this.baseUrl = 'https://api.deepseek.com',
     http.Client? client,
   }) : _client = client ?? http.Client();
 
@@ -26,19 +26,29 @@ class OpenAiChatAdapter implements AiAdapter {
   @override
   bool get isAvailable => apiKey.trim().isNotEmpty;
 
+  String get _completionsUrl {
+    final root = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    if (root.endsWith('/v1')) {
+      return '$root/chat/completions';
+    }
+    return '$root/chat/completions';
+  }
+
   @override
   Future<Result<AiCoachReply>> generateCoachReply(
     AiCoachRequest request,
   ) async {
     if (!isAvailable) {
       return const Err(
-        UnsupportedFailure('OpenAI API key is missing.'),
+        UnsupportedFailure('AI API key is missing.'),
       );
     }
 
     try {
       final messages = _buildMessages(request);
-      final uri = Uri.parse('$baseUrl/chat/completions');
+      final uri = Uri.parse(_completionsUrl);
       final response = await _client.post(
         uri,
         headers: {
@@ -55,7 +65,7 @@ class OpenAiChatAdapter implements AiAdapter {
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return Err(
           NetworkFailure(
-            'OpenAI error ${response.statusCode}: ${response.body}',
+            'AI error ${response.statusCode}: ${response.body}',
           ),
         );
       }
@@ -63,16 +73,16 @@ class OpenAiChatAdapter implements AiAdapter {
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
       final choices = decoded['choices'] as List<dynamic>?;
       if (choices == null || choices.isEmpty) {
-        return const Err(NetworkFailure('OpenAI returned no choices.'));
+        return const Err(NetworkFailure('AI returned no choices.'));
       }
       final message = choices.first['message'] as Map<String, dynamic>?;
       final content = (message?['content'] as String?)?.trim() ?? '';
       if (content.isEmpty) {
-        return const Err(NetworkFailure('OpenAI returned empty content.'));
+        return const Err(NetworkFailure('AI returned empty content.'));
       }
       return Success(AiCoachReply(content: content));
     } catch (error) {
-      return Err(NetworkFailure('OpenAI request failed', cause: error));
+      return Err(NetworkFailure('AI request failed', cause: error));
     }
   }
 

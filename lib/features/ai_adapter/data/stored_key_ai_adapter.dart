@@ -36,7 +36,12 @@ class StoredKeyAiAdapter implements AiAdapter {
       return const OfflineNoopAiAdapter();
     }
     _hasKeyCache = true;
-    return OpenAiChatAdapter(apiKey: key, client: _client);
+    return OpenAiChatAdapter(
+      apiKey: key,
+      baseUrl: DevApiKey.baseUrl,
+      model: DevApiKey.model,
+      client: _client,
+    );
   }
 
   @override

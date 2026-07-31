@@ -1,7 +1,8 @@
 /// Template for [DevApiKey].
 ///
-/// For personal Kompas builds the real key lives in `dev_api_key.dart`
-/// so GitHub Actions APK builds work without a separate server.
+/// Real personal values live in `dev_api_key.dart` for GitHub APK builds.
 abstract final class DevApiKey {
   static const value = '';
+  static const baseUrl = 'https://api.deepseek.com';
+  static const model = 'deepseek-chat';
 }
