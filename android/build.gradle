@@ -13,16 +13,24 @@ ext.kompasNdkVersion = "27.2.12479018"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
-subprojects {
-    project.evaluationDependsOn(":app")
-}
+
+// Register before evaluationDependsOn — that call can evaluate projects early.
 subprojects { subproject ->
-    subproject.afterEvaluate {
+    def applyNdk = {
         def androidExt = subproject.extensions.findByName("android")
         if (androidExt != null && androidExt.hasProperty("ndkVersion")) {
             androidExt.ndkVersion = rootProject.ext.kompasNdkVersion
         }
     }
+    if (subproject.state.executed) {
+        applyNdk()
+    } else {
+        subproject.afterEvaluate(applyNdk)
+    }
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {
