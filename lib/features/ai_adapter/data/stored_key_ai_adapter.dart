@@ -1,18 +1,26 @@
 import 'package:http/http.dart' as http;
+import 'package:kompas/config/dev_api_key.dart';
 import 'package:kompas/core/errors/failures.dart';
 import 'package:kompas/core/errors/result.dart';
 import 'package:kompas/features/ai_adapter/data/ai_api_key_store.dart';
 import 'package:kompas/features/ai_adapter/data/openai_chat_adapter.dart';
 import 'package:kompas/features/ai_adapter/domain/ai_adapter.dart';
 
-/// Resolves the OpenAI key from local storage on every call.
+/// Resolves the API key from prefs / dart-define / embedded [DevApiKey].
 class StoredKeyAiAdapter implements AiAdapter {
   StoredKeyAiAdapter(this._store, {http.Client? client})
-      : _client = client ?? http.Client();
+      : _client = client ?? http.Client(),
+        _hasKeyCache = _syncHasEmbeddedKey();
 
   final AiApiKeyStore _store;
   final http.Client _client;
-  bool _hasKeyCache = false;
+  bool _hasKeyCache;
+
+  static bool _syncHasEmbeddedKey() {
+    if (DevApiKey.value.trim().isNotEmpty) return true;
+    if (AiApiKeyStore.dartDefineKey.trim().isNotEmpty) return true;
+    return false;
+  }
 
   Future<void> refreshAvailability() async {
     _hasKeyCache = await _store.hasKey();
@@ -39,7 +47,7 @@ class StoredKeyAiAdapter implements AiAdapter {
     if (!adapter.isAvailable) {
       return const Err(
         UnsupportedFailure(
-          'Добавьте OpenAI API ключ в Настройках, чтобы говорить с коучем.',
+          'AI ключ не найден. Проверьте lib/config/dev_api_key.dart или Настройки.',
         ),
       );
     }

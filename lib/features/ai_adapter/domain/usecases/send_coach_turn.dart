@@ -71,13 +71,6 @@ class SendCoachTurn extends UseCase<SendCoachTurnResult, SendCoachTurnParams> {
     if (text.isEmpty) {
       return const Err(ValidationFailure('Message is empty.'));
     }
-    if (!_ai.isAvailable) {
-      return const Err(
-        UnsupportedFailure(
-          'Добавьте OpenAI API ключ в Настройках, чтобы говорить с коучем.',
-        ),
-      );
-    }
 
     final strategyResult = await _generateStrategy(
       GenerateLearningStrategyParams(userId: params.userId),
