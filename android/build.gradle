@@ -6,11 +6,23 @@ allprojects {
 }
 
 rootProject.buildDir = "../build"
+
+// whisper_flutter_new pins a beta NDK; force a stable r27c for app + plugins.
+ext.kompasNdkVersion = "27.2.12479018"
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+subprojects { subproject ->
+    subproject.afterEvaluate {
+        def androidExt = subproject.extensions.findByName("android")
+        if (androidExt != null && androidExt.hasProperty("ndkVersion")) {
+            androidExt.ndkVersion = rootProject.ext.kompasNdkVersion
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

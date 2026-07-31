@@ -26,8 +26,8 @@ if (flutterVersionName == null) {
 android {
     namespace = "com.kompas.kompas"
     compileSdk = flutter.compileSdkVersion
-    // whisper_flutter_new requires NDK 27+ (Flutter default is older).
-    ndkVersion = "27.0.11902837"
+    // Stable NDK r27c — also forced on plugins in ../build.gradle.
+    ndkVersion = rootProject.ext.kompasNdkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
