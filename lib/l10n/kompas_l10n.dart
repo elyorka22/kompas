@@ -160,6 +160,19 @@ class KompasL10n {
   String get welcome => _t(ru: 'Добро пожаловать', uz: 'Xush kelibsiz');
   String helloName(String name) =>
       _t(ru: 'Привет, $name', uz: 'Salom, $name');
+  String goodMorningName(String name) =>
+      _t(ru: 'Доброе утро, $name.', uz: 'Xayrli tong, $name.');
+  String goodAfternoonName(String name) =>
+      _t(ru: 'Добрый день, $name.', uz: 'Hayrli kun, $name.');
+  String goodEveningName(String name) =>
+      _t(ru: 'Добрый вечер, $name.', uz: 'Hayrli kech, $name.');
+  String get coachRecommendsToday => _t(
+        ru: 'Сегодня коуч рекомендует',
+        uz: 'Bugun murabbiy tavsiya qiladi',
+      );
+  String get reasonLabel => _t(ru: 'Почему', uz: 'Nima uchun');
+  String get startTodaysSession =>
+      _t(ru: 'Начать сегодняшнюю сессию', uz: 'Bugungi sessiyani boshlash');
   String get todaysProgress =>
       _t(ru: 'Прогресс сегодня', uz: 'Bugungi taraqqiyot');
   String get missionsLoading => _t(
@@ -190,11 +203,12 @@ class KompasL10n {
   String get openPractice => _t(ru: 'Открыть практику', uz: 'Mashqni ochish');
   String get notebook => _t(ru: 'Блокнот', uz: 'Daftar');
   String get notebookHomeHint => _t(
-        ru:
-            'Сохраняйте выражения из практики. Memory Engine напомнит о повторении.',
-        uz:
-            'Mashqdan iboralarni saqlang. Memory Engine takrorlashni eslatadi.',
+        ru: 'Ваша база знаний — слова, выражения, ошибки.',
+        uz: 'Bilim bazangiz — so‘zlar, iboralar, xatolar.',
       );
+  String get openNotebook => _t(ru: 'Открыть блокнот', uz: 'Daftarni ochish');
+  String get recentAchievements =>
+      _t(ru: 'Недавние достижения', uz: 'So‘nggi yutuqlar');
   String get skillProgress =>
       _t(ru: 'Прогресс навыков', uz: 'Ko‘nikmalar taraqqiyoti');
   String get skillXpAfterSession => _t(
@@ -211,16 +225,29 @@ class KompasL10n {
   // ── Practice ──────────────────────────────────────────────────────────
   String get practiceTitle => _t(ru: 'Практика', uz: 'Mashq');
   String get practiceSubtitle => _t(
-        ru: 'Локальные упражнения Compass Engine — без ИИ',
-        uz: 'Compass Engine lokal mashqlari — sun’iy intellektsiz',
+        ru: 'Одна миссия. Один фокус. Ваш коуч уже выбрал.',
+        uz: 'Bitta missiya. Bitta fokus. Murabbiyingiz tanladi.',
       );
   String get noExerciseYet =>
       _t(ru: 'Упражнение пока недоступно.', uz: 'Hali mashq yo‘q.');
   String get recommendedByCoach =>
-      _t(ru: 'Рекомендовано Coach Engine', uz: 'Coach Engine tavsiyasi');
+      _t(ru: 'Рекомендовано коучем', uz: 'Murabbiy tavsiyasi');
   String get start => _t(ru: 'Начать', uz: 'Boshlash');
+  String get startMission => _t(ru: 'Начать миссию', uz: 'Missiyani boshlash');
   String get practiceModes =>
-      _t(ru: 'Режимы практики', uz: 'Mashq rejimlari');
+      _t(ru: 'Другие миссии', uz: 'Boshqa missiyalar');
+  String get estimatedMinutes =>
+      _t(ru: '~2 мин', uz: '~2 daqiqa');
+  String difficultyLabel(String name) {
+    return switch (name) {
+      'starter' => _t(ru: 'Старт', uz: 'Boshlanish'),
+      'core' => _t(ru: 'Основной', uz: 'Asosiy'),
+      'stretch' => _t(ru: 'Сложный', uz: 'Murakkab'),
+      _ => name,
+    };
+  }
+  String skillsTrained(String skill) =>
+      _t(ru: 'Навык: $skill', uz: 'Ko‘nikma: $skill');
 
   String practiceModeTitle(String modeName) {
     return switch (modeName) {
@@ -309,8 +336,38 @@ class KompasL10n {
   // ── Progress ──────────────────────────────────────────────────────────
   String get progressTitle => _t(ru: 'Прогресс', uz: 'Taraqqiyot');
   String get progressSubtitle => _t(
-        ru: 'Реальная активность Compass, Coach и Memory',
-        uz: 'Compass, Coach va Memory haqiqiy faoliyati',
+        ru: 'История вашего роста — не таблица цифр.',
+        uz: 'O‘sishingiz hikoyasi — raqamlar jadvali emas.',
+      );
+  String get yourStory => _t(ru: 'Ваша история', uz: 'Sizning hikoyangiz');
+  String spokeThisWeek(int minutes) => _t(
+        ru: 'На этой неделе вы говорили $minutes минут.',
+        uz: 'Bu hafta $minutes daqiqa gapirdingiz.',
+      );
+  String improvedSkill(String skill, int percent) => _t(
+        ru: 'Вы продвинулись в «$skill» на $percent%.',
+        uz: '«$skill» bo‘yicha $percent% o‘sdingiz.',
+      );
+  String streakStory(int days) => days <= 0
+      ? _t(
+          ru: 'Начните серию сегодня — коуч рядом.',
+          uz: 'Bugun seriyani boshlang — murabbiy yonida.',
+        )
+      : _t(
+          ru: 'Ваша серия — $days ${_dayWord(days)}. Держите ритм.',
+          uz: 'Seriyangiz — $days kun. Ritmni saqlang.',
+        );
+  String _dayWord(int days) {
+    if (days % 10 == 1 && days % 100 != 11) return 'день';
+    if (days % 10 >= 2 && days % 10 <= 4 && (days % 100 < 10 || days % 100 >= 20)) {
+      return 'дня';
+    }
+    return 'дней';
+  }
+
+  String coachNextFocus(String skill) => _t(
+        ru: 'Коуч рекомендует дальше: $skill.',
+        uz: 'Murabbiy keyingi fokus: $skill.',
       );
   String get completeSessionForProgress => _t(
         ru: 'Завершите сессию, чтобы открыть прогресс.',
@@ -319,7 +376,7 @@ class KompasL10n {
   String bestStreak(int days) =>
       _t(ru: 'Рекорд $days', uz: 'Rekord $days');
   String get weeklyActivity =>
-      _t(ru: 'Активность за неделю', uz: 'Haftalik faoliyat');
+      _t(ru: 'Ритм', uz: 'Ritm');
   String get noWeeklyYet => _t(
         ru: 'Пока нет завершённых сессий. Здесь появится ваш ритм.',
         uz: 'Hali sessiya yo‘q. Bu yerda ritmingiz paydo bo‘ladi.',
@@ -350,13 +407,13 @@ class KompasL10n {
   String get unlocked => _t(ru: 'Открыто', uz: 'Ochilgan');
   String get locked => _t(ru: 'Закрыто', uz: 'Yopiq');
   String get memoryInsights =>
-      _t(ru: 'Инсайты памяти', uz: 'Xotira tushunchalari');
+      _t(ru: 'Инсайты коуча', uz: 'Murabbiy tushunchalari');
 
   // ── Notebook / Skills shell ───────────────────────────────────────────
-  String get notebookTitle => _t(ru: 'Блокнот', uz: 'Daftar');
+  String get notebookTitle => _t(ru: 'База знаний', uz: 'Bilim bazasi');
   String get notebookSubtitle => _t(
-        ru: 'Выражения, заметки и правки',
-        uz: 'Iboralar, eslatmalar va tuzatishlar',
+        ru: 'Слова, выражения, идиомы и ошибки — всё под рукой.',
+        uz: 'So‘zlar, iboralar, idiomalar va xatolar — qo‘l ostida.',
       );
   String get notebookEmpty => _t(
         ru:
@@ -364,15 +421,34 @@ class KompasL10n {
         uz:
             'Mashq paytida iboralarni saqlang. Memory Engine takrorlashni belgilaydi.',
       );
-  String get skillTreeTitle => _t(ru: 'Дерево навыков', uz: 'Ko‘nikmalar daraxti');
+  String get notebookSearchHint =>
+      _t(ru: 'Поиск по базе знаний', uz: 'Bilim bazasidan qidirish');
+  String get notebookPinned => _t(ru: 'Закреплённые', uz: 'Qadalganlar');
+  String get notebookRecent => _t(ru: 'Недавно', uz: 'Yaqinda');
+  String get notebookAll => _t(ru: 'Все', uz: 'Hammasi');
+  String get notebookFilterWords => _t(ru: 'Слова', uz: 'So‘zlar');
+  String get notebookFilterExpressions =>
+      _t(ru: 'Выражения', uz: 'Iboralar');
+  String get notebookFilterIdioms => _t(ru: 'Идиомы', uz: 'Idiomalar');
+  String get notebookFilterMistakes => _t(ru: 'Ошибки', uz: 'Xatolar');
+  String get notebookFilterFavorites =>
+      _t(ru: 'Избранное', uz: 'Sevimlilar');
+  String get notebookFilterNotes => _t(ru: 'Заметки', uz: 'Eslatmalar');
+  String get skillTreeTitle => _t(ru: 'Навыки', uz: 'Ko‘nikmalar');
   String get skillTreeSubtitle => _t(
-        ru: 'Разговорные способности, которые накапливаются',
-        uz: 'Vaqt o‘tishi bilan o‘sadigan suhbat qobiliyatlari',
+        ru: 'Живой путь — от закрытых к освоенным.',
+        uz: 'Jonli yo‘l — yopiqdan o‘zlashtirilgangacha.',
       );
   String get completeOnboardingForPath => _t(
         ru: 'Завершите онбординг, чтобы открыть путь.',
         uz: 'Yo‘lni ochish uchun onboardingni yakunlang.',
       );
+  String get skillStatusLocked => _t(ru: 'Закрыт', uz: 'Yopiq');
+  String get skillStatusAvailable => _t(ru: 'Доступен', uz: 'Mavjud');
+  String get skillStatusGrowing => _t(ru: 'Растёт', uz: 'O‘smoqda');
+  String get skillStatusMastered => _t(ru: 'Освоен', uz: 'O‘zlashtirilgan');
+  String skillXpLabel(int xp, int target) =>
+      _t(ru: '$xp / $target XP', uz: '$xp / $target XP');
 }
 
 class KompasL10nDelegate extends LocalizationsDelegate<KompasL10n> {

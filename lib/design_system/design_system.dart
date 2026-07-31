@@ -3,6 +3,7 @@ library;
 
 export 'package:kompas/design_system/components/compass_buttons.dart';
 export 'package:kompas/design_system/components/compass_card.dart';
+export 'package:kompas/design_system/components/compass_coach_ui.dart';
 export 'package:kompas/design_system/components/compass_content_cards.dart';
 export 'package:kompas/design_system/components/compass_inputs.dart';
 export 'package:kompas/design_system/components/compass_navigation.dart';

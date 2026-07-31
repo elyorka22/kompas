@@ -21,14 +21,20 @@ class SessionCompleteScreen extends ConsumerWidget {
     final strategy = ref.watch(learningStrategyProvider);
     final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
 
     if (finished == null || finished.session.id != sessionId) {
       return Scaffold(
-        appBar: CompassAppBar(title: l10n.sessionComplete),
-        body: Center(
-          child: CompassPrimaryButton(
-            label: l10n.backHome,
-            onPressed: () => context.go(AppRoutes.home),
+        backgroundColor: Colors.transparent,
+        body: CompassAtmosphere(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(CompassSpacing.lg),
+              child: CompassPrimaryButton(
+                label: l10n.backHome,
+                onPressed: () => context.go(AppRoutes.home),
+              ),
+            ),
           ),
         ),
       );
@@ -39,6 +45,7 @@ class SessionCompleteScreen extends ConsumerWidget {
         (session.currentExerciseId != null
             ? SkillXpRules.primaryExerciseXp
             : 0);
+    final minutes = session.speakingSeconds ~/ 60;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -48,100 +55,60 @@ class SessionCompleteScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.all(CompassSpacing.screenHorizontal),
               children: [
-                const SizedBox(height: CompassSpacing.lg),
-                CompassHeroPanel(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Center(
-                        child: CompassPulse(
-                          child: CompassWidget(size: 88),
-                        ),
-                      ),
-                      const SizedBox(height: CompassSpacing.lg),
-                      Text(
-                        l10n.sessionComplete,
-                        style: text.displaySmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: CompassSpacing.sm),
-                      Text(
-                        l10n.sessionRecordedOffline,
-                        style: text.bodyLarge?.copyWith(
-                          color: Colors.white.withOpacity(0.92),
-                        ),
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: CompassSpacing.xl),
+                const Center(
+                  child: CompassPulse(child: CompassWidget(size: 72)),
                 ),
                 const SizedBox(height: CompassSpacing.xl),
-                Row(
-                  children: [
-                    Expanded(
-                      child: CompassStatisticCard(
-                        label: l10n.speaking,
-                        value: '${session.speakingSeconds}s',
-                        icon: CompassIcons.practice,
-                      ),
-                    ),
-                    const SizedBox(width: CompassSpacing.sm),
-                    Expanded(
-                      child: CompassStatisticCard(
-                        label: l10n.xpEarned,
-                        value: '+$xp',
-                        icon: CompassIcons.skills,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: CompassSpacing.sm),
-                Row(
-                  children: [
-                    Expanded(
-                      child: CompassStatisticCard(
-                        label: l10n.streak,
-                        value: '${finished.streakDays}d',
-                        icon: CompassIcons.streak,
-                      ),
-                    ),
-                    const SizedBox(width: CompassSpacing.sm),
-                    Expanded(
-                      child: CompassStatisticCard(
-                        label: l10n.sessions,
-                        value: '${finished.statistics.completedSessions}',
-                        icon: CompassIcons.progress,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: CompassSpacing.xl),
-                CompassSectionHeader(title: l10n.skillGrowth),
+                Text(l10n.sessionComplete, style: text.displaySmall),
                 const SizedBox(height: CompassSpacing.md),
-              if (finished.updatedSkills.isEmpty)
-                CompassCard(child: Text(l10n.noSkillXp))
-              else
-                for (final skill in finished.updatedSkills) ...[
-                  CompassSkillCard(
-                    title: DefaultSkillCatalog.byId(skill.skillId)?.title ??
-                        skill.skillId,
-                    subtitle: '${skill.xp} XP · ${skill.status.name}',
-                    progress: () {
-                      final catalog = DefaultSkillCatalog.byId(skill.skillId);
-                      if (catalog == null || catalog.xpToMaster <= 0) {
-                        return 0.0;
-                      }
-                      return (skill.xp / catalog.xpToMaster).clamp(0.0, 1.0);
-                    }(),
+                CompassInsightStory(
+                  story: l10n.spokeThisWeek(
+                    minutes > 0 ? minutes : 1,
                   ),
-                  const SizedBox(height: CompassSpacing.sm),
-                ],
-              const SizedBox(height: CompassSpacing.lg),
-              CompassSectionHeader(title: l10n.coachRecommendation),
-              const SizedBox(height: CompassSpacing.md),
-              CompassCard(
-                child: Text(
+                  emphasis: true,
+                ),
+                CompassInsightStory(
+                  story: '+$xp XP · ${l10n.streakDays(finished.streakDays)}',
+                ),
+                const SizedBox(height: CompassSpacing.lg),
+                Text(
+                  l10n.skillGrowth,
+                  style: text.labelLarge?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: CompassSpacing.md),
+                if (finished.updatedSkills.isEmpty)
+                  Text(l10n.noSkillXp, style: text.bodyMedium)
+                else
+                  for (final skill in finished.updatedSkills) ...[
+                    CompassSoftRow(
+                      title: DefaultSkillCatalog.byId(skill.skillId)?.title ??
+                          skill.skillId,
+                      subtitle: '${skill.xp} XP · ${skill.status.name}',
+                      trailing: SizedBox(
+                        width: 72,
+                        child: CompassProgressBar(
+                          value: skill.progressRatio(
+                            xpToMaster: DefaultSkillCatalog.byId(skill.skillId)
+                                    ?.xpToMaster ??
+                                100,
+                          ),
+                          height: 4,
+                        ),
+                      ),
+                    ),
+                  ],
+                const SizedBox(height: CompassSpacing.xl),
+                Text(
+                  l10n.coachRecommendation,
+                  style: text.labelLarge?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: CompassSpacing.md),
+                Text(
                   strategy.maybeWhen(
                     data: (value) {
                       if (value == null || value.reasons.isEmpty) {
@@ -151,44 +118,40 @@ class SessionCompleteScreen extends ConsumerWidget {
                     },
                     orElse: () => l10n.coachPreparingFocus,
                   ),
-                  style: text.bodyLarge,
+                  style: text.titleLarge?.copyWith(height: 1.4),
                 ),
-              ),
-              const SizedBox(height: CompassSpacing.xl),
-              CompassSectionHeader(title: l10n.nextSuggestedExercise),
-              const SizedBox(height: CompassSpacing.md),
-              nextExercise.when(
-                data: (exercise) {
-                  if (exercise == null) {
-                    return CompassCard(
-                      child: Text(l10n.openPracticeToContinue),
+                const SizedBox(height: CompassSpacing.xl),
+                nextExercise.when(
+                  data: (exercise) {
+                    if (exercise == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return CompassCoachRecommend(
+                      meta: l10n.nextSuggestedExercise,
+                      title: exercise.title,
+                      reason: exercise.prompt,
+                      actionLabel: l10n.openPractice,
+                      onAction: () => context.go(AppRoutes.practice),
                     );
-                  }
-                  return CompassExerciseCard(
-                    title: exercise.title,
-                    subtitle: exercise.prompt,
-                    meta: l10n.practiceModeTitle(exercise.mode.name),
-                    onTap: () => context.go(AppRoutes.practice),
-                  );
-                },
-                loading: () => const LinearProgressIndicator(),
-                error: (error, _) => Text('$error'),
-              ),
-              const SizedBox(height: CompassSpacing.xl),
-              CompassPrimaryButton(
-                label: l10n.backToDashboard,
-                onPressed: () => context.go(AppRoutes.home),
-              ),
-              const SizedBox(height: CompassSpacing.sm),
-              CompassSecondaryButton(
-                label: l10n.viewProgress,
-                onPressed: () => context.go(AppRoutes.progress),
-              ),
-              const SizedBox(height: CompassSpacing.xl),
-            ],
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+                const SizedBox(height: CompassSpacing.xl),
+                CompassPrimaryButton(
+                  label: l10n.backToDashboard,
+                  onPressed: () => context.go(AppRoutes.home),
+                ),
+                const SizedBox(height: CompassSpacing.sm),
+                CompassGhostButton(
+                  label: l10n.viewProgress,
+                  onPressed: () => context.go(AppRoutes.progress),
+                ),
+                const SizedBox(height: CompassSpacing.xl),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

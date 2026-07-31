@@ -50,13 +50,11 @@ class CompassProgressRing extends StatelessWidget {
                 gradientColors: onDark
                     ? const [
                         Color(0xFFFFFFFF),
-                        Color(0xFFFFE0D4),
-                        Color(0xFFFF8A5C),
+                        Color(0xFFE8FFFB),
                       ]
                     : const [
                         CompassColors.compassBright,
-                        CompassColors.aurora,
-                        CompassColors.needle,
+                        CompassColors.compass,
                       ],
               ),
               child: Center(child: child),
@@ -161,9 +159,8 @@ class CompassProgressBar extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
+                            CompassColors.compassBright,
                             CompassColors.compass,
-                            CompassColors.aurora,
-                            CompassColors.needle,
                           ],
                         ),
                       ),

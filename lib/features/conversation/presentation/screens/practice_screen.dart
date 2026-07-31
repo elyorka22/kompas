@@ -10,6 +10,7 @@ import 'package:kompas/features/profile/providers/profile_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/services/compass/practice_mode_catalog.dart';
+import 'package:kompas/shared/catalog/default_skill_catalog.dart';
 
 class PracticeScreen extends ConsumerWidget {
   const PracticeScreen({super.key});
@@ -37,99 +38,90 @@ class PracticeScreen extends ConsumerWidget {
     );
   }
 
+  String _skillTitle(String skillId) {
+    for (final skill in DefaultSkillCatalog.skills) {
+      if (skill.id == skillId) return skill.title;
+    }
+    return skillId;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final recommended = ref.watch(recommendedExerciseProvider);
     final strategy = ref.watch(learningStrategyProvider);
     final l10n = KompasL10n.of(context);
-    final text = Theme.of(context).textTheme;
+
+    final reason = strategy.maybeWhen(
+      data: (value) => value?.reasons.isNotEmpty == true
+          ? value!.reasons.first.message
+          : l10n.recommendedByCoach,
+      orElse: () => l10n.recommendedByCoach,
+    );
+
+    final durationLabel = strategy.maybeWhen(
+      data: (value) {
+        if (value == null) return l10n.estimatedMinutes;
+        final minutes = (value.suggestedSpeakingSeconds / 60).ceil().clamp(1, 30);
+        return l10n.minutesLabel(minutes);
+      },
+      orElse: () => l10n.estimatedMinutes,
+    );
 
     return CompassPageTemplate(
-      header: CompassSectionHeader(
+      header: CompassPageIntro(
         title: l10n.practiceTitle,
         subtitle: l10n.practiceSubtitle,
       ),
       children: [
-        CompassAppear(
-          child: recommended.when(
-            data: (exercise) {
-              if (exercise == null) {
-                return CompassCard(
-                  child: Text(l10n.noExerciseYet),
-                );
-              }
-              final reason = strategy.maybeWhen(
-                data: (value) => value?.reasons.isNotEmpty == true
-                    ? value!.reasons.first.message
-                    : l10n.recommendedByCoach,
-                orElse: () => l10n.recommendedByCoach,
+        recommended.when(
+          data: (exercise) {
+            if (exercise == null) {
+              return CompassQuietSurface(
+                child: Text(l10n.noExerciseYet),
               );
-              return CompassExerciseCard(
-                title: exercise.title,
-                subtitle: exercise.prompt,
-                meta: reason,
-                onTap: () => _start(
-                  context,
-                  ref,
-                  mode: exercise.mode,
-                  exerciseId: exercise.id,
-                ),
-                trailing: CompassPrimaryButton(
-                  label: l10n.start,
-                  expanded: false,
-                  size: CompassButtonSize.compact,
-                  onPressed: () => _start(
-                    context,
-                    ref,
-                    mode: exercise.mode,
-                    exerciseId: exercise.id,
-                  ),
-                ),
-              );
-            },
-            loading: () => const LinearProgressIndicator(),
-            error: (error, _) => Text('$error'),
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.practiceModes, style: text.titleLarge),
-            const SizedBox(height: CompassSpacing.md),
-            for (final mode in PracticeMode.values) ...[
-              CompassAppear(
-                delay: Duration(milliseconds: 40 * mode.index),
-                child: CompassCard(
-                  onTap: () => _start(context, ref, mode: mode),
-                  padding: const EdgeInsets.all(CompassSpacing.md),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.practiceModeTitle(mode.name),
-                              style: text.titleMedium,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              PracticeModeCatalog.defaultPrompt(mode),
-                              style: text.bodySmall,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(CompassIcons.chevronRight),
-                    ],
-                  ),
-                ),
+            }
+            return CompassMissionExercise(
+              featured: true,
+              title: exercise.title,
+              difficulty: l10n.difficultyLabel(exercise.difficulty.name),
+              durationLabel: durationLabel,
+              skillsLabel: l10n.skillsTrained(_skillTitle(exercise.primarySkillId)),
+              reason: exercise.coachHint?.isNotEmpty == true
+                  ? exercise.coachHint!
+                  : reason,
+              actionLabel: l10n.startMission,
+              onAction: () => _start(
+                context,
+                ref,
+                mode: exercise.mode,
+                exerciseId: exercise.id,
               ),
-              const SizedBox(height: CompassSpacing.sm),
+            );
+          },
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => Text('$error'),
+        ),
+        CompassQuietSection(
+          label: l10n.practiceModes,
+          child: Column(
+            children: [
+              for (final mode in PracticeMode.values) ...[
+                CompassAppear(
+                  delay: Duration(milliseconds: 40 * mode.index),
+                  child: CompassMissionExercise(
+                    title: l10n.practiceModeTitle(mode.name),
+                    difficulty: l10n.difficultyLabel('core'),
+                    durationLabel: l10n.estimatedMinutes,
+                    skillsLabel: l10n.practiceTitle,
+                    reason: PracticeModeCatalog.defaultPrompt(mode),
+                    actionLabel: l10n.start,
+                    onAction: () => _start(context, ref, mode: mode),
+                  ),
+                ),
+                const SizedBox(height: CompassSpacing.md),
+              ],
             ],
-          ],
+          ),
         ),
       ],
     );

@@ -152,6 +152,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         }
 
         return Scaffold(
+          backgroundColor: Colors.transparent,
           appBar: CompassAppBar(
             title: session.title,
             leading: IconButton(
@@ -159,108 +160,135 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
               onPressed: () => context.pop(),
             ),
           ),
-          body: CompassConversationTemplate(
-            header: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CompassBadge(
-                  label: l10n.practiceModeTitle(session.mode.name),
-                  tone: CompassBadgeTone.brand,
-                ),
-                const SizedBox(height: CompassSpacing.sm),
-                Text(
-                  l10n.sessionEarnXp(SkillXpRules.sessionFinishXp),
-                  style: text.bodySmall,
-                ),
-              ],
-            ),
-            stage: ListView(
-              children: [
-                CompassAppear(
-                  child: CompassCard.elevated(
+          body: CompassAtmosphere(
+            child: CompassConversationTemplate(
+              header: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.practiceModeTitle(session.mode.name),
+                    style: text.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: CompassSpacing.xs),
+                  Text(
+                    l10n.sessionEarnXp(SkillXpRules.sessionFinishXp),
+                    style: text.bodySmall,
+                  ),
+                ],
+              ),
+              stage: ListView(
+                children: [
+                  CompassAppear(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(l10n.coachPrompt, style: text.titleMedium),
-                        const SizedBox(height: CompassSpacing.sm),
-                        Text(session.prompt ?? '', style: text.bodyLarge),
-                        const SizedBox(height: CompassSpacing.lg),
-                        Row(
-                          children: [
-                            CompassProgressRing(
+                        Text(
+                          l10n.coachPrompt,
+                          style: text.labelLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: CompassSpacing.md),
+                        Text(
+                          session.prompt ?? '',
+                          style: text.headlineMedium?.copyWith(height: 1.35),
+                        ),
+                        const SizedBox(height: CompassSpacing.xxl),
+                        Center(
+                          child: CompassPulse(
+                            child: CompassProgressRing(
                               value: (_elapsedSeconds / 120).clamp(0.0, 1.0),
-                              size: 72,
+                              size: 140,
+                              strokeWidth: 8,
                               child: Text(
                                 _format(_elapsedSeconds),
-                                style: text.labelMedium,
+                                style: text.headlineSmall,
                               ),
                             ),
-                            const SizedBox(width: CompassSpacing.lg),
-                            Expanded(
-                              child: Text(
-                                _running
-                                    ? l10n.speakNow
-                                    : l10n.startTimerHint,
-                                style: text.bodyMedium,
-                              ),
+                          ),
+                        ),
+                        const SizedBox(height: CompassSpacing.lg),
+                        Center(
+                          child: Text(
+                            _running ? l10n.speakNow : l10n.startTimerHint,
+                            textAlign: TextAlign.center,
+                            style: text.bodyLarge?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: CompassSpacing.lg),
-                messagesAsync.when(
-                  data: (messages) {
-                    final coach = messages
-                        .where((m) => m.role == MessageRole.coach)
-                        .toList();
-                    if (coach.isEmpty) return const SizedBox.shrink();
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.sessionNotes, style: text.titleMedium),
-                        const SizedBox(height: CompassSpacing.sm),
-                        for (final message in coach)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: CompassSpacing.sm,
-                            ),
-                            child: CompassGlassCard(
-                              padding: const EdgeInsets.all(CompassSpacing.md),
-                              child: Text(message.content),
+                  const SizedBox(height: CompassSpacing.xl),
+                  messagesAsync.when(
+                    data: (messages) {
+                      final coach = messages
+                          .where((m) => m.role == MessageRole.coach)
+                          .toList();
+                      if (coach.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.sessionNotes,
+                            style: text.labelLarge?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                           ),
-                      ],
-                    );
-                  },
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
-                ),
-                const SizedBox(height: CompassSpacing.md),
-                Text(l10n.capturePhrase, style: text.titleMedium),
-                const SizedBox(height: CompassSpacing.sm),
-                CompassInput(
-                  controller: _noteController,
-                  hint: l10n.capturePhraseHint,
-                  maxLines: 3,
-                ),
-              ],
-            ),
-            composer: Column(
-              children: [
-                CompassSecondaryButton(
-                  label: _running ? l10n.pauseTimer : l10n.startSpeakingTimer,
-                  icon: _running ? Icons.pause_rounded : CompassIcons.practice,
-                  onPressed: _finishing ? null : _toggleTimer,
-                ),
-                const SizedBox(height: CompassSpacing.sm),
-                CompassPrimaryButton(
-                  label: _finishing ? l10n.saving : l10n.finishSession,
-                  onPressed: _finishing ? null : _finish,
-                ),
-              ],
+                          const SizedBox(height: CompassSpacing.sm),
+                          for (final message in coach)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: CompassSpacing.sm,
+                              ),
+                              child: Text(
+                                message.content,
+                                style: text.bodyLarge,
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                  ),
+                  const SizedBox(height: CompassSpacing.lg),
+                  Text(
+                    l10n.capturePhrase,
+                    style: text.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: CompassSpacing.sm),
+                  CompassInput(
+                    controller: _noteController,
+                    hint: l10n.capturePhraseHint,
+                    maxLines: 3,
+                  ),
+                ],
+              ),
+              composer: Column(
+                children: [
+                  CompassSecondaryButton(
+                    label: _running ? l10n.pauseTimer : l10n.startSpeakingTimer,
+                    icon:
+                        _running ? Icons.pause_rounded : CompassIcons.practice,
+                    onPressed: _finishing ? null : _toggleTimer,
+                  ),
+                  const SizedBox(height: CompassSpacing.sm),
+                  CompassPrimaryButton(
+                    label: _finishing ? l10n.saving : l10n.finishSession,
+                    onPressed: _finishing ? null : _finish,
+                  ),
+                ],
+              ),
             ),
           ),
         );

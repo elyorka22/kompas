@@ -146,8 +146,7 @@ class CompassExerciseCard extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   CompassColors.compassBright,
-                  CompassColors.aurora,
-                  CompassColors.needle,
+                  CompassColors.compass,
                 ],
               ),
             ),

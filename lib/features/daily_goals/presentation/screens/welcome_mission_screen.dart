@@ -15,6 +15,7 @@ class WelcomeMissionScreen extends ConsumerWidget {
     final missions = ref.watch(todaysMissionsProvider);
     final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -26,40 +27,46 @@ class WelcomeMissionScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: CompassSpacing.lg),
-                  const CompassPulse(child: CompassWidget(size: 96)),
+                  const SizedBox(height: CompassSpacing.xl),
+                  const CompassPulse(child: CompassWidget(size: 72)),
                   const SizedBox(height: CompassSpacing.xl),
                   Text(l10n.firstMissionTitle, style: text.displaySmall),
-                  const SizedBox(height: CompassSpacing.sm),
+                  const SizedBox(height: CompassSpacing.md),
                   Text(
                     l10n.firstMissionBody,
-                    style: text.bodyLarge,
+                    style: text.bodyLarge?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      height: 1.5,
+                    ),
                   ),
                   const SizedBox(height: CompassSpacing.xl),
                   Expanded(
                     child: missions.when(
                       data: (items) {
                         if (items.isEmpty) {
-                          return CompassCard(
-                            child: Text(l10n.missionsAppearLater),
+                          return Text(
+                            l10n.missionsAppearLater,
+                            style: text.bodyMedium,
                           );
                         }
-                        return ListView.separated(
-                          itemCount: items.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: CompassSpacing.sm),
-                          itemBuilder: (context, index) {
-                            final mission = items[index];
-                            return CompassAppear(
-                              delay: Duration(milliseconds: 80 * index),
-                              child: CompassMissionCard(
-                                title: mission.title,
-                                subtitle: mission.description,
-                                progress: mission.progressRatio,
-                                completed: mission.isComplete,
+                        return ListView(
+                          children: [
+                            for (var i = 0; i < items.length; i++)
+                              CompassAppear(
+                                delay: Duration(milliseconds: 80 * i),
+                                child: CompassSoftRow(
+                                  title: items[i].title,
+                                  subtitle: items[i].description,
+                                  trailing: items[i].isComplete
+                                      ? Icon(
+                                          Icons.check_circle_rounded,
+                                          color: scheme.primary,
+                                          size: 20,
+                                        )
+                                      : null,
+                                ),
                               ),
-                            );
-                          },
+                          ],
                         );
                       },
                       loading: () => const Center(

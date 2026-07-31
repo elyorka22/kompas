@@ -10,10 +10,10 @@ abstract final class CompassSpacing {
   static const double huge = 64;
   static const double massive = 96;
 
-  static const double screenHorizontal = 20;
-  static const double screenTop = 16;
-  static const double sectionGap = 28;
-  static const double cardGap = 12;
+  static const double screenHorizontal = 24;
+  static const double screenTop = 20;
+  static const double sectionGap = 40;
+  static const double cardGap = 16;
 
   /// Minimum interactive target (accessibility).
   static const double touchTarget = 48;

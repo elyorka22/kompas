@@ -12,41 +12,54 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = KompasL10n.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: CompassAtmosphere(
         child: navigationShell,
       ),
-      bottomNavigationBar: CompassBottomNavigation(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: navigationShell.goBranch,
-        destinations: [
-          CompassBottomDestination(
-            label: l10n.navHome,
-            icon: CompassIcons.home,
-            selectedIcon: CompassIcons.homeFilled,
+      bottomNavigationBar: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isDark ? CompassColors.darkCard : Colors.white.withOpacity(0.92),
+          border: Border(
+            top: BorderSide(
+              color: isDark
+                  ? Colors.white.withOpacity(0.06)
+                  : Colors.black.withOpacity(0.05),
+            ),
           ),
-          CompassBottomDestination(
-            label: l10n.navPractice,
-            icon: CompassIcons.practice,
-            selectedIcon: CompassIcons.practiceFilled,
-          ),
-          CompassBottomDestination(
-            label: l10n.navNotebook,
-            icon: CompassIcons.notebook,
-            selectedIcon: CompassIcons.notebookFilled,
-          ),
-          CompassBottomDestination(
-            label: l10n.navSkills,
-            icon: CompassIcons.skills,
-            selectedIcon: CompassIcons.skillsFilled,
-          ),
-          CompassBottomDestination(
-            label: l10n.navProgress,
-            icon: CompassIcons.progress,
-            selectedIcon: CompassIcons.progressFilled,
-          ),
-        ],
+        ),
+        child: CompassBottomNavigation(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: navigationShell.goBranch,
+          destinations: [
+            CompassBottomDestination(
+              label: l10n.navHome,
+              icon: CompassIcons.home,
+              selectedIcon: CompassIcons.homeFilled,
+            ),
+            CompassBottomDestination(
+              label: l10n.navPractice,
+              icon: CompassIcons.practice,
+              selectedIcon: CompassIcons.practiceFilled,
+            ),
+            CompassBottomDestination(
+              label: l10n.navNotebook,
+              icon: CompassIcons.notebook,
+              selectedIcon: CompassIcons.notebookFilled,
+            ),
+            CompassBottomDestination(
+              label: l10n.navSkills,
+              icon: CompassIcons.skills,
+              selectedIcon: CompassIcons.skillsFilled,
+            ),
+            CompassBottomDestination(
+              label: l10n.navProgress,
+              icon: CompassIcons.progress,
+              selectedIcon: CompassIcons.progressFilled,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -67,7 +80,6 @@ class ShellHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         CompassSpacing.screenHorizontal,
@@ -75,30 +87,20 @@ class ShellHeader extends StatelessWidget {
         CompassSpacing.screenHorizontal,
         CompassSpacing.md,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 4),
-            child: CompassMark(size: 28),
-          ),
-          const SizedBox(width: CompassSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: text.headlineMedium),
-                if (subtitle != null) Text(subtitle!, style: text.bodyMedium),
-              ],
+      child: CompassPageIntro(
+        title: title,
+        subtitle: subtitle,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (trailing != null) trailing!,
+            IconButton(
+              tooltip: KompasL10n.of(context).settings,
+              onPressed: () => context.push(AppRoutes.settings),
+              icon: const Icon(CompassIcons.settings),
             ),
-          ),
-          if (trailing != null) trailing!,
-          IconButton(
-            tooltip: KompasL10n.of(context).settings,
-            onPressed: () => context.push(AppRoutes.settings),
-            icon: const Icon(CompassIcons.settings),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

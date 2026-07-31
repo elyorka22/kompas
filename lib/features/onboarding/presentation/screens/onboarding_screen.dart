@@ -224,9 +224,8 @@ class _StepIndicator extends StatelessWidget {
                 gradient: i <= current
                     ? const LinearGradient(
                         colors: [
+                          CompassColors.compassBright,
                           CompassColors.compass,
-                          CompassColors.aurora,
-                          CompassColors.needle,
                         ],
                       )
                     : null,

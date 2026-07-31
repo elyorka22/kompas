@@ -53,18 +53,16 @@ class CompassPrimaryButton extends StatelessWidget {
               borderRadius: radius,
               gradient: enabled
                   ? LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                       colors: isDark
                           ? const [
                               CompassColors.compassBright,
-                              Color(0xFF3DB8E8),
-                              Color(0xFFFF7A55),
+                              Color(0xFF14B8A6),
                             ]
                           : const [
                               CompassColors.compass,
-                              Color(0xFF1AABB8),
-                              CompassColors.needle,
+                              CompassColors.compassDeep,
                             ],
                     )
                   : null,
@@ -74,9 +72,9 @@ class CompassPrimaryButton extends StatelessWidget {
               boxShadow: enabled
                   ? [
                       BoxShadow(
-                        color: CompassColors.compass.withOpacity(0.35),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
+                        color: CompassColors.compass.withOpacity(0.22),
+                        blurRadius: 18,
+                        offset: const Offset(0, 10),
                       ),
                     ]
                   : null,
@@ -153,10 +151,10 @@ class CompassSecondaryButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           side: BorderSide(
-            color: scheme.primary.withOpacity(0.55),
-            width: 1.4,
+            color: scheme.outline.withOpacity(0.7),
+            width: 1,
           ),
-          foregroundColor: scheme.primary,
+          foregroundColor: scheme.onSurface,
         ),
         child: child,
       ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kompas/design_system/motion/compass_motion.dart';
 import 'package:kompas/design_system/tokens/compass_colors.dart';
 
-/// Soft moving aurora behind screens — premium atmosphere, not flat gray.
+/// Soft moving wash behind screens — quiet premium atmosphere.
 class CompassAtmosphere extends StatefulWidget {
   const CompassAtmosphere({
     super.key,
@@ -28,7 +28,7 @@ class _CompassAtmosphereState extends State<CompassAtmosphere>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 12),
+      duration: const Duration(seconds: 16),
     )..repeat(reverse: true);
   }
 
@@ -51,55 +51,47 @@ class _CompassAtmosphereState extends State<CompassAtmosphere>
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment(-0.8 + t * 0.3, -1),
-                  end: Alignment(1, 1.1 - t * 0.2),
+                  begin: Alignment(-0.6 + t * 0.2, -1),
+                  end: Alignment.bottomRight,
                   colors: isDark
                       ? [
                           CompassColors.darkSurface,
                           Color.lerp(
-                            const Color(0xFF0A2A2C),
-                            const Color(0xFF12283A),
+                            const Color(0xFF0A1C1E),
+                            const Color(0xFF0F1A22),
                             t,
                           )!,
                           CompassColors.darkSurface,
                         ]
                       : [
-                          CompassColors.porcelain,
+                          const Color(0xFFF7FBFA),
                           Color.lerp(
-                            CompassColors.compassSoft,
-                            CompassColors.auroraSoft,
+                            const Color(0xFFEEF7F6),
+                            const Color(0xFFF4F8FA),
                             t,
                           )!,
-                          const Color(0xFFFFF7F3),
+                          const Color(0xFFF9F7F5),
                         ],
                 ),
               ),
             ),
             Positioned(
-              top: -80 + 30 * t,
-              right: -40,
+              top: -100 + 20 * t,
+              right: -50,
               child: _GlowOrb(
-                size: 220 * widget.intensity,
+                size: 260 * widget.intensity,
                 color: (isDark
                         ? CompassColors.compassBright
                         : CompassColors.compass)
-                    .withOpacity(isDark ? 0.22 : 0.28),
+                    .withOpacity(isDark ? 0.12 : 0.14),
               ),
             ),
             Positioned(
-              bottom: 80,
-              left: -60 + 20 * (1 - t),
+              bottom: 40,
+              left: -70,
               child: _GlowOrb(
-                size: 180 * widget.intensity,
-                color: CompassColors.needle.withOpacity(isDark ? 0.16 : 0.18),
-              ),
-            ),
-            Positioned(
-              top: 220,
-              left: 40 + 40 * t,
-              child: _GlowOrb(
-                size: 120 * widget.intensity,
-                color: CompassColors.aurora.withOpacity(isDark ? 0.14 : 0.2),
+                size: 200 * widget.intensity,
+                color: CompassColors.needle.withOpacity(isDark ? 0.06 : 0.07),
               ),
             ),
             child!,
@@ -137,7 +129,7 @@ class _GlowOrb extends StatelessWidget {
   }
 }
 
-/// Gradient hero surface for dashboard / celebration moments.
+/// Soft mentor surface for rare celebration moments.
 class CompassHeroPanel extends StatelessWidget {
   const CompassHeroPanel({
     super.key,
@@ -155,7 +147,7 @@ class CompassHeroPanel extends StatelessWidget {
     final panel = AnimatedContainer(
       duration: CompassMotion.normal,
       curve: CompassMotion.standard,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         borderRadius: radius,
         gradient: LinearGradient(
@@ -163,22 +155,19 @@ class CompassHeroPanel extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? const [
-                  Color(0xFF0F4D4A),
-                  Color(0xFF163A55),
-                  Color(0xFF4A2A22),
+                  Color(0xFF0E3A38),
+                  Color(0xFF143048),
                 ]
               : const [
-                  Color(0xFF0E9A96),
-                  Color(0xFF1FB8C9),
-                  Color(0xFFFF7A4D),
+                  Color(0xFF0E8F8A),
+                  Color(0xFF147A8F),
                 ],
         ),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? CompassColors.compassBright : CompassColors.compass)
-                .withOpacity(0.35),
+            color: CompassColors.compass.withOpacity(0.22),
             blurRadius: 28,
-            offset: const Offset(0, 14),
+            offset: const Offset(0, 16),
           ),
         ],
       ),
@@ -207,14 +196,13 @@ class CompassHeroPanel extends StatelessWidget {
   }
 }
 
-/// Accent strip used on cards for visual rhythm.
+/// Accent strip used sparingly for visual rhythm.
 class CompassAccentBar extends StatelessWidget {
   const CompassAccentBar({
     super.key,
     this.colors = const [
       CompassColors.compassBright,
-      CompassColors.aurora,
-      CompassColors.needle,
+      CompassColors.compass,
     ],
   });
 
@@ -223,7 +211,7 @@ class CompassAccentBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 4,
+      height: 3,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(99),
         gradient: LinearGradient(colors: colors),
@@ -232,7 +220,7 @@ class CompassAccentBar extends StatelessWidget {
   }
 }
 
-/// Subtle shimmer pulse for loading / live states.
+/// Subtle shimmer pulse for live states.
 class CompassPulse extends StatefulWidget {
   const CompassPulse({super.key, required this.child});
 
@@ -251,7 +239,7 @@ class _CompassPulseState extends State<CompassPulse>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1600),
+      duration: const Duration(milliseconds: 1800),
     )..repeat(reverse: true);
   }
 
@@ -266,7 +254,7 @@ class _CompassPulseState extends State<CompassPulse>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final scale = 1 + (_controller.value * 0.025);
+        final scale = 1 + (_controller.value * 0.02);
         return Transform.scale(scale: scale, child: child);
       },
       child: widget.child,
