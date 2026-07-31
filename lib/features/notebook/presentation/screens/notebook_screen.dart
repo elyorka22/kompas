@@ -5,6 +5,7 @@ import 'package:kompas/domain/entities/notebook_item.dart';
 import 'package:kompas/domain/enums/memory_enums.dart';
 import 'package:kompas/features/notebook/providers/notebook_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
+import 'package:kompas/widgets/voice_input_button.dart';
 
 enum _NotebookFilter {
   all,
@@ -90,6 +91,10 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
           controller: _search,
           hint: l10n.notebookSearchHint,
           onChanged: (_) => setState(() {}),
+          suffixIcon: VoiceInputButton(
+            controller: _search,
+            onTextUpdated: (_) => setState(() {}),
+          ),
         ),
         const SizedBox(height: CompassSpacing.md),
         SingleChildScrollView(

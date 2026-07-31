@@ -17,6 +17,7 @@ import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/progress/providers/progress_providers.dart';
 import 'package:kompas/features/skill_tree/providers/skill_tree_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
+import 'package:kompas/widgets/voice_input_button.dart';
 import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/services/compass/skill_xp_rules.dart';
 
@@ -271,6 +272,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                     controller: _noteController,
                     hint: l10n.capturePhraseHint,
                     maxLines: 3,
+                    suffixIcon: VoiceInputButton(controller: _noteController),
                   ),
                 ],
               ),

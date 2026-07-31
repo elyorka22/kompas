@@ -16,7 +16,9 @@ import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
+import 'package:kompas/providers/voice_provider.dart';
 import 'package:kompas/shared/catalog/russian_topic_catalog.dart';
+import 'package:kompas/widgets/voice_input_button.dart';
 
 /// Heart of Compass — AI Russian conversation coach.
 class CoachChatScreen extends ConsumerStatefulWidget {
@@ -343,8 +345,14 @@ class _CoachChatScreenState extends ConsumerState<CoachChatScreen> {
             controller: _input,
             sending: _sending || _starting,
             onSend: () => _send(),
+            onVoiceStopped: (text) {
+              final autoSend = ref.read(voiceAutoSendProvider);
+              if (autoSend && text.trim().isNotEmpty) {
+                _send(text);
+              }
+            },
             hint: l10n.chatHint,
-            voiceLabel: l10n.voiceSoon,
+            voiceLabel: l10n.voiceInput,
             attachLabel: l10n.attachSoon,
           ),
         ],
@@ -394,6 +402,7 @@ class _ComposerBar extends StatelessWidget {
     required this.controller,
     required this.sending,
     required this.onSend,
+    required this.onVoiceStopped,
     required this.hint,
     required this.voiceLabel,
     required this.attachLabel,
@@ -402,6 +411,7 @@ class _ComposerBar extends StatelessWidget {
   final TextEditingController controller;
   final bool sending;
   final VoidCallback onSend;
+  final ValueChanged<String> onVoiceStopped;
   final String hint;
   final String voiceLabel;
   final String attachLabel;
@@ -451,12 +461,12 @@ class _ComposerBar extends StatelessWidget {
                   ),
                 ),
               ),
-              IconButton(
+              VoiceInputButton(
+                controller: controller,
+                enabled: !sending,
                 tooltip: voiceLabel,
-                onPressed: () {
-                  CompassSnackbars.show(context, message: voiceLabel);
-                },
-                icon: const Icon(Icons.mic_none_rounded),
+                onTextUpdated: (_) {},
+                onListeningStopped: onVoiceStopped,
               ),
               CompassPressable(
                 enabled: !sending,

@@ -45,3 +45,6 @@ app.*.map.json
 # Optional local overrides (prefer committed personal key for APK builds)
 .env.local
 secrets/
+
+# Large offline STT models (download via scripts/download_vosk_model.sh)
+assets/models/*.zip

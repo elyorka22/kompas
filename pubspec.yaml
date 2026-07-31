@@ -34,6 +34,12 @@ dependencies:
   http: ^1.6.0
   shared_preferences: ^2.3.3
 
+  # Offline voice input (Vosk). Vendored + SDK-patched for Flutter 3.22.3 /
+  # Dart 3.4.4 — see third_party/vosk_flutter/README.md.
+  vosk_flutter:
+    path: third_party/vosk_flutter
+  permission_handler: ^11.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -46,3 +52,5 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/
+    # Place vosk-model-small-ru-0.22.zip here (see scripts/download_vosk_model.sh).
+    - assets/models/

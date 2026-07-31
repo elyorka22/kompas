@@ -75,6 +75,7 @@ class CompassSearchField extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.onClear,
+    this.suffixIcon,
   });
 
   final TextEditingController? controller;
@@ -84,8 +85,21 @@ class CompassSearchField extends StatelessWidget {
   final ValueChanged<String>? onSubmitted;
   final VoidCallback? onClear;
 
+  /// Extra trailing control (e.g. [VoiceInputButton]). Shown before clear.
+  final Widget? suffixIcon;
+
   @override
   Widget build(BuildContext context) {
+    final trailing = <Widget>[
+      if (suffixIcon != null) suffixIcon!,
+      if (onClear != null)
+        IconButton(
+          tooltip: 'Clear',
+          onPressed: onClear,
+          icon: const Icon(CompassIcons.close),
+        ),
+    ];
+
     return CompassInput(
       controller: controller,
       focusNode: focusNode,
@@ -94,13 +108,14 @@ class CompassSearchField extends StatelessWidget {
       onSubmitted: onSubmitted,
       textInputAction: TextInputAction.search,
       prefixIcon: const Icon(CompassIcons.search),
-      suffixIcon: onClear == null
+      suffixIcon: trailing.isEmpty
           ? null
-          : IconButton(
-              tooltip: 'Clear',
-              onPressed: onClear,
-              icon: const Icon(CompassIcons.close),
-            ),
+          : trailing.length == 1
+              ? trailing.first
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: trailing,
+                ),
     );
   }
 }

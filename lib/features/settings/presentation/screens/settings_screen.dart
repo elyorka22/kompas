@@ -8,6 +8,7 @@ import 'package:kompas/domain/enums/misc_enums.dart';
 import 'package:kompas/features/ai_adapter/data/stored_key_ai_adapter.dart';
 import 'package:kompas/features/settings/providers/settings_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
+import 'package:kompas/providers/voice_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -193,6 +194,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         );
                         await ref.read(updateSettingsProvider)(next);
                         ref.invalidate(appSettingsProvider);
+                      },
+                    ),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.voiceAutoSend),
+                      subtitle: Text(l10n.voiceAutoSendSubtitle),
+                      value: ref.watch(voiceAutoSendProvider),
+                      onChanged: (enabled) async {
+                        await ref
+                            .read(voiceAutoSendProvider.notifier)
+                            .setEnabled(enabled);
                       },
                     ),
                   ],

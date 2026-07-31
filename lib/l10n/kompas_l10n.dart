@@ -74,6 +74,16 @@ class KompasL10n {
       _t(ru: 'Напишите на русском…', uz: 'Ruscha yozing…');
   String get voiceSoon =>
       _t(ru: 'Голос скоро', uz: 'Ovoz tez orada');
+  String get voiceInput =>
+      _t(ru: 'Голосовой ввод', uz: 'Ovozli kiritish');
+  String get voiceAutoSend => _t(
+        ru: 'Автоотправка после распознавания',
+        uz: 'Tanib bo‘lgach avto-yuborish',
+      );
+  String get voiceAutoSendSubtitle => _t(
+        ru: 'После «Готово» сообщение сразу уходит коучу',
+        uz: '«Tayyor» dan so‘ng xabar murabbiyga yuboriladi',
+      );
   String get attachSoon =>
       _t(ru: 'Вложения скоро', uz: 'Ilovalar tez orada');
   String get coachTyping =>

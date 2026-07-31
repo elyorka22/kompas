@@ -1,0 +1,51 @@
+name: vosk_flutter
+description: Flutter plugin for offline speech recognition using the Vosk speech recognition toolkit.
+version: 0.3.48+kompas1
+homepage: https://alphacephei.com/
+repository: https://github.com/alphacep/vosk-flutter
+publish_to: none
+
+# Vendored from alphacep/vosk-flutter@02e300c and patched for Flutter 3.22.3 /
+# Dart 3.4.4 (upstream pub.dev still declares SDK <3.0.0; newer git needs 3.5.2+).
+
+environment:
+  sdk: ">=3.4.4 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  archive: ^3.1.8
+  args: ^2.4.0
+  build_cli_annotations: ^2.1.0
+  ffi: ^2.0.1
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  package_config: ^2.1.0
+  path: ^1.8.2
+  path_provider: ^2.0.8
+  permission_handler: ^11.3.1
+  pubspec_parse: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+ffigen:
+  name: VoskLibrary
+  output: 'lib/src/generated_vosk_bindings.dart'
+  headers:
+    entry-points:
+      - 'vosk-api/src/vosk_api.h'
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: org.vosk.vosk_flutter
+        pluginClass: VoskFlutterPlugin
+      linux:
+        pluginClass: VoskFlutterPlugin
+        ffiPlugin: true
+      windows:
+        pluginClass: VoskFlutterPlugin
+        ffiPlugin: true
