@@ -13,10 +13,7 @@ final appSettingsProvider = FutureProvider<AppSettings>((ref) async {
 });
 
 final themePreferenceProvider = Provider<ThemePreference>((ref) {
-  return ref.watch(appSettingsProvider).maybeWhen(
-        data: (settings) => settings.themePreference,
-        orElse: () => ThemePreference.system,
-      );
+  return ThemePreference.light;
 });
 
 final interfaceLanguageProvider = Provider<AppLanguage>((ref) {

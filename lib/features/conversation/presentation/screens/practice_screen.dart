@@ -5,30 +5,30 @@ import 'package:kompas/core/providers/use_case_providers.dart';
 import 'package:kompas/design_system/design_system.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
 import 'package:kompas/features/compass_engine/domain/usecases/start_session.dart';
-import 'package:kompas/features/daily_goals/providers/dashboard_providers.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
-import 'package:kompas/services/compass/practice_mode_catalog.dart';
-import 'package:kompas/shared/catalog/default_skill_catalog.dart';
 
+/// Simple missions / practice list.
 class PracticeScreen extends ConsumerWidget {
   const PracticeScreen({super.key});
+
+  static const _modes = <PracticeMode>[
+    PracticeMode.tellAboutDay,
+    PracticeMode.describeImage,
+    PracticeMode.defendOpinion,
+    PracticeMode.continueStory,
+  ];
 
   Future<void> _start(
     BuildContext context,
     WidgetRef ref, {
-    PracticeMode? mode,
-    String? exerciseId,
+    required PracticeMode mode,
   }) async {
     final user = await ref.read(activeUserProvider.future);
     if (user == null || !context.mounted) return;
     final result = await ref.read(startSessionProvider)(
-      StartSessionParams(
-        userId: user.id,
-        mode: mode,
-        exerciseId: exerciseId,
-      ),
+      StartSessionParams(userId: user.id, mode: mode),
     );
     if (!context.mounted) return;
     result.fold(
@@ -38,92 +38,37 @@ class PracticeScreen extends ConsumerWidget {
     );
   }
 
-  String _skillTitle(String skillId) {
-    for (final skill in DefaultSkillCatalog.skills) {
-      if (skill.id == skillId) return skill.title;
-    }
-    return skillId;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recommended = ref.watch(recommendedExerciseProvider);
-    final strategy = ref.watch(learningStrategyProvider);
     final l10n = KompasL10n.of(context);
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
 
-    final reason = strategy.maybeWhen(
-      data: (value) => value?.reasons.isNotEmpty == true
-          ? value!.reasons.first.message
-          : l10n.recommendedByCoach,
-      orElse: () => l10n.recommendedByCoach,
-    );
-
-    final durationLabel = strategy.maybeWhen(
-      data: (value) {
-        if (value == null) return l10n.estimatedMinutes;
-        final minutes = (value.suggestedSpeakingSeconds / 60).ceil().clamp(1, 30);
-        return l10n.minutesLabel(minutes);
-      },
-      orElse: () => l10n.estimatedMinutes,
-    );
-
-    return CompassPageTemplate(
-      header: CompassPageIntro(
-        title: l10n.practiceTitle,
-        subtitle: l10n.practiceSubtitle,
-      ),
-      children: [
-        recommended.when(
-          data: (exercise) {
-            if (exercise == null) {
-              return CompassQuietSurface(
-                child: Text(l10n.noExerciseYet),
-              );
-            }
-            return CompassMissionExercise(
-              featured: true,
-              title: exercise.title,
-              difficulty: l10n.difficultyLabel(exercise.difficulty.name),
-              durationLabel: durationLabel,
-              skillsLabel: l10n.skillsTrained(_skillTitle(exercise.primarySkillId)),
-              reason: exercise.coachHint?.isNotEmpty == true
-                  ? exercise.coachHint!
-                  : reason,
-              actionLabel: l10n.startMission,
-              onAction: () => _start(
-                context,
-                ref,
-                mode: exercise.mode,
-                exerciseId: exercise.id,
+    return Scaffold(
+      backgroundColor: scheme.surface,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(CompassSpacing.screenHorizontal),
+          children: [
+            Text(l10n.practiceTitle, style: text.headlineSmall),
+            const SizedBox(height: CompassSpacing.xs),
+            Text(
+              l10n.practiceSubtitle,
+              style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: CompassSpacing.xl),
+            for (final mode in _modes) ...[
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.practiceModeTitle(mode.name)),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _start(context, ref, mode: mode),
               ),
-            );
-          },
-          loading: () => const LinearProgressIndicator(),
-          error: (error, _) => Text('$error'),
-        ),
-        CompassQuietSection(
-          label: l10n.practiceModes,
-          child: Column(
-            children: [
-              for (final mode in PracticeMode.values) ...[
-                CompassAppear(
-                  delay: Duration(milliseconds: 40 * mode.index),
-                  child: CompassMissionExercise(
-                    title: l10n.practiceModeTitle(mode.name),
-                    difficulty: l10n.difficultyLabel('core'),
-                    durationLabel: l10n.estimatedMinutes,
-                    skillsLabel: l10n.practiceTitle,
-                    reason: PracticeModeCatalog.defaultPrompt(mode),
-                    actionLabel: l10n.start,
-                    onAction: () => _start(context, ref, mode: mode),
-                  ),
-                ),
-                const SizedBox(height: CompassSpacing.md),
-              ],
+              Divider(color: scheme.outlineVariant.withOpacity(0.5)),
             ],
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

@@ -28,6 +28,7 @@ import 'package:kompas/features/memory_engine/domain/usecases/save_expression.da
 import 'package:kompas/features/notebook/domain/usecases/list_notebook_items.dart';
 import 'package:kompas/features/notebook/domain/usecases/save_notebook_item.dart';
 import 'package:kompas/features/onboarding/domain/usecases/complete_onboarding.dart';
+import 'package:kompas/features/profile/domain/usecases/ensure_local_user.dart';
 import 'package:kompas/features/profile/domain/usecases/get_active_user.dart';
 import 'package:kompas/features/profile/domain/usecases/update_user_profile.dart';
 import 'package:kompas/features/progress/domain/usecases/get_user_statistics.dart';
@@ -49,6 +50,10 @@ final completeOnboardingProvider = Provider<CompleteOnboarding>((ref) {
 
 final getActiveUserProvider = Provider<GetActiveUser>((ref) {
   return GetActiveUser(ref.watch(userRepositoryProvider));
+});
+
+final ensureLocalUserProvider = Provider<EnsureLocalUser>((ref) {
+  return EnsureLocalUser(ref.watch(userRepositoryProvider));
 });
 
 final updateUserProfileProvider = Provider<UpdateUserProfile>((ref) {

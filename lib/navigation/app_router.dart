@@ -6,14 +6,10 @@ import 'package:kompas/features/conversation/presentation/screens/coach_chat_scr
 import 'package:kompas/features/conversation/presentation/screens/practice_screen.dart';
 import 'package:kompas/features/conversation/presentation/screens/session_complete_screen.dart';
 import 'package:kompas/features/conversation/presentation/screens/session_screen.dart';
-import 'package:kompas/features/daily_goals/presentation/screens/home_screen.dart';
-import 'package:kompas/features/daily_goals/presentation/screens/welcome_mission_screen.dart';
 import 'package:kompas/features/notebook/presentation/screens/notebook_screen.dart';
-import 'package:kompas/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
 import 'package:kompas/features/progress/presentation/screens/progress_screen.dart';
 import 'package:kompas/features/settings/presentation/screens/settings_screen.dart';
-import 'package:kompas/features/skill_tree/presentation/screens/skill_tree_screen.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/presentation/shell/app_shell.dart';
@@ -38,21 +34,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final status = auth.value;
       final location = state.matchedLocation;
       final atSplash = location == AppRoutes.splash;
-      final loggingIn = location == AppRoutes.onboarding;
 
       if (status.isLoading || status.hasError) {
         return atSplash ? null : AppRoutes.splash;
       }
 
-      final onboarded = status.value ?? false;
-      if (!onboarded) {
-        return loggingIn ? null : AppRoutes.onboarding;
+      final ready = status.value ?? false;
+      if (!ready) {
+        // Still bootstrapping local user — stay on splash.
+        return atSplash ? null : AppRoutes.splash;
       }
-      if (atSplash) {
+      if (atSplash ||
+          location == AppRoutes.onboarding ||
+          location == AppRoutes.welcomeMission) {
         return AppRoutes.coach;
-      }
-      if (loggingIn) {
-        return AppRoutes.welcomeMission;
       }
       return null;
     },
@@ -62,20 +57,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => CompassPageTransitions.fadeScale(
           key: state.pageKey,
           child: const SplashScreen(),
-        ),
-      ),
-      GoRoute(
-        path: AppRoutes.onboarding,
-        pageBuilder: (context, state) => CompassPageTransitions.fadeSlide(
-          key: state.pageKey,
-          child: const OnboardingScreen(),
-        ),
-      ),
-      GoRoute(
-        path: AppRoutes.welcomeMission,
-        pageBuilder: (context, state) => CompassPageTransitions.fadeSlide(
-          key: state.pageKey,
-          child: const WelcomeMissionScreen(),
         ),
       ),
       GoRoute(
@@ -102,10 +83,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
-      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AppShell(navigationShell: navigationShell);
@@ -124,14 +101,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutes.notebook,
                 builder: (context, state) => const NotebookScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoutes.skills,
-                builder: (context, state) => const SkillTreeScreen(),
               ),
             ],
           ),
@@ -188,41 +157,33 @@ class _SplashScreenState extends State<SplashScreen>
     final l10n = KompasL10n.of(context);
     final text = Theme.of(context).textTheme;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CompassAtmosphere(
-        intensity: 1.2,
-        child: Center(
-          child: FadeTransition(
-            opacity: CurvedAnimation(
-              parent: _controller,
-              curve: CompassMotion.standard,
-            ),
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.92, end: 1).animate(
-                CurvedAnimation(
-                  parent: _controller,
-                  curve: CompassMotion.springy,
+      backgroundColor: Colors.white,
+      body: Center(
+        child: FadeTransition(
+          opacity: CurvedAnimation(
+            parent: _controller,
+            curve: CompassMotion.standard,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CompassWidget(size: 88),
+              const SizedBox(height: CompassSpacing.lg),
+              Text(
+                l10n.appName,
+                style: text.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CompassPulse(
-                    child: CompassWidget(size: 112),
-                  ),
-                  const SizedBox(height: CompassSpacing.lg),
-                  Text(
-                    l10n.appName,
-                    style: text.displaySmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: CompassSpacing.xs),
-                  Text(l10n.splashTagline, style: text.bodyLarge),
-                ],
+              const SizedBox(height: CompassSpacing.xs),
+              Text(
+                l10n.splashTagline,
+                style: text.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

@@ -12,21 +12,14 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = KompasL10n.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CompassAtmosphere(
-        child: navigationShell,
-      ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: navigationShell,
       bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
-          color: isDark ? CompassColors.darkCard : Colors.white.withOpacity(0.92),
+          color: Colors.white,
           border: Border(
-            top: BorderSide(
-              color: isDark
-                  ? Colors.white.withOpacity(0.06)
-                  : Colors.black.withOpacity(0.05),
-            ),
+            top: BorderSide(color: Colors.black.withOpacity(0.06)),
           ),
         ),
         child: CompassBottomNavigation(
@@ -42,11 +35,6 @@ class AppShell extends StatelessWidget {
               label: l10n.navNotebook,
               icon: CompassIcons.notebook,
               selectedIcon: CompassIcons.notebookFilled,
-            ),
-            CompassBottomDestination(
-              label: l10n.navSkills,
-              icon: CompassIcons.skills,
-              selectedIcon: CompassIcons.skillsFilled,
             ),
             CompassBottomDestination(
               label: l10n.navProgress,

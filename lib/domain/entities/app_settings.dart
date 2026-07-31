@@ -7,7 +7,7 @@ class AppSettings extends Equatable {
   const AppSettings({
     required this.id,
     required this.updatedAt,
-    this.themePreference = ThemePreference.system,
+    this.themePreference = ThemePreference.light,
     this.interfaceLanguage = AppLanguage.ru,
     this.hapticsEnabled = true,
     this.soundEnabled = true,
