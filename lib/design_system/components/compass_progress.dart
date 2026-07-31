@@ -103,7 +103,6 @@ class _RingPainter extends CustomPainter {
         startAngle: -math.pi / 2,
         endAngle: 3 * math.pi / 2,
         colors: gradientColors,
-        stops: const [0.0, 0.55, 1.0],
         transform: const GradientRotation(-math.pi / 2),
       ).createShader(rect);
 
