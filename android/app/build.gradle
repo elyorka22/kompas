@@ -39,8 +39,8 @@ android {
         applicationId = "com.kompas.kompas"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        // Android baseline for mic + native Whisper libs.
-        minSdk = 21
+        // Android baseline for mic + record_android (requires 23+).
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
