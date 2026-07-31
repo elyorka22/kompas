@@ -46,6 +46,6 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Kompas uses the microphone for offline voice input with Vosk speech recognition.</string>
+	<string>Kompas uses the microphone for offline Russian speech recognition.</string>
 </dict>
 </plist>

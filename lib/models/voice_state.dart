@@ -1,25 +1,13 @@
-/// Immutable snapshot of the global offline voice-input pipeline.
-///
-/// Consumed by Riverpod UI; produced by [VoiceInputService].
+/// UI-facing snapshot for the mic button (backed by [SpeechEngine]).
 library;
 
 enum VoiceStatus {
-  /// Plugin / model not loaded yet.
   idle,
-
-  /// Model is loading (first call only).
   initializing,
-
-  /// Ready to listen.
   ready,
-
-  /// Microphone is open; partial results may stream.
   listening,
-
-  /// Transient work between stop and final flush.
   processing,
-
-  /// Recoverable failure (permission, missing model, init, etc.).
+  downloading,
   error,
 }
 
@@ -30,17 +18,16 @@ class VoiceState {
     this.committedText = '',
     this.errorMessage,
     this.isModelLoaded = false,
+    this.downloadProgress = 0,
   });
 
   final VoiceStatus status;
   final String partialText;
-
-  /// Finalized segments accumulated during the current listening session.
   final String committedText;
   final String? errorMessage;
   final bool isModelLoaded;
+  final double downloadProgress;
 
-  /// Best live draft for TextField binding: committed + current partial.
   String get liveText {
     final committed = committedText.trim();
     final partial = partialText.trim();
@@ -53,7 +40,8 @@ class VoiceState {
   bool get isBusy =>
       status == VoiceStatus.initializing ||
       status == VoiceStatus.listening ||
-      status == VoiceStatus.processing;
+      status == VoiceStatus.processing ||
+      status == VoiceStatus.downloading;
   bool get hasError => status == VoiceStatus.error;
 
   VoiceState copyWith({
@@ -62,6 +50,7 @@ class VoiceState {
     String? committedText,
     String? errorMessage,
     bool? isModelLoaded,
+    double? downloadProgress,
     bool clearError = false,
   }) {
     return VoiceState(
@@ -70,10 +59,7 @@ class VoiceState {
       committedText: committedText ?? this.committedText,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       isModelLoaded: isModelLoaded ?? this.isModelLoaded,
+      downloadProgress: downloadProgress ?? this.downloadProgress,
     );
   }
-
-  @override
-  String toString() =>
-      'VoiceState(status: $status, live: "$liveText", error: $errorMessage)';
 }

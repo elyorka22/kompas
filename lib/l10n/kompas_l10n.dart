@@ -84,6 +84,26 @@ class KompasL10n {
         ru: 'После «Готово» сообщение сразу уходит коучу',
         uz: '«Tayyor» dan so‘ng xabar murabbiyga yuboriladi',
       );
+  String get speechSection =>
+      _t(ru: 'Распознавание речи', uz: 'Nutqni aniqlash');
+  String get speechEngineLabel =>
+      _t(ru: 'Движок: Whisper Offline (русский)', uz: 'Dvigatel: Whisper Offline (rus)');
+  String get speechModelLabel => _t(ru: 'Модель', uz: 'Model');
+  String get speechModelSmall =>
+      _t(ru: 'Small (рекомендуется)', uz: 'Small (tavsiya)');
+  String get speechModelBase => _t(ru: 'Base', uz: 'Base');
+  String get speechModelDownloaded =>
+      _t(ru: 'Скачана', uz: 'Yuklab olingan');
+  String get speechModelMissing =>
+      _t(ru: 'Не скачана', uz: 'Yuklanmagan');
+  String get speechDownloadModel =>
+      _t(ru: 'Скачать модель', uz: 'Modelni yuklash');
+  String get speechDeleteModel =>
+      _t(ru: 'Удалить модель', uz: 'Modelni o‘chirish');
+  String get speechRussianOnlyHint => _t(
+        ru: 'Распознавание только русского. Другие языки не поддерживаются.',
+        uz: 'Faqat rus tili aniqlanadi. Boshqa tillar qo‘llab-quvvatlanmaydi.',
+      );
   String get attachSoon =>
       _t(ru: 'Вложения скоро', uz: 'Ilovalar tez orada');
   String get coachTyping =>

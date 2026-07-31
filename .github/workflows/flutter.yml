@@ -65,9 +65,6 @@ jobs:
           flutter config --no-analytics
           flutter pub get
 
-      - name: Download Vosk Russian model
-        run: ./scripts/download_vosk_model.sh
-
       - name: Build APK
         run: flutter build apk --release
 

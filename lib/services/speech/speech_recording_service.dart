@@ -1,6 +1,6 @@
 /// Platform recording boundary (audio file for speech *analysis*).
 ///
-/// For dictation / TextField STT use the global VoiceInputService instead —
+/// For dictation / TextField STT use the global SpeechEngine instead —
 /// do not create a second recognizer.
 library;
 
@@ -10,9 +10,8 @@ import 'package:kompas/core/errors/result.dart';
 /// Platform recording boundary.
 ///
 /// Concrete mic/file implementation is wired in a later milestone.
-/// Architecture owns the contract so Conversation Sessions can depend on it now.
 /// Pronunciation exercises that need spoken *text* should call
-/// VoiceInputService (shared offline Vosk STT), not a parallel ASR stack.
+/// SpeechEngine (shared offline Whisper STT), not a parallel ASR stack.
 abstract class SpeechRecordingService {
   Future<Result<void>> start();
   Future<Result<SpeechRecordingResult>> stop();

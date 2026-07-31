@@ -1,4 +1,4 @@
-/// Animated mic control that binds [VoiceInputService] to a [TextEditingController].
+/// Animated mic control bound to [SpeechEngine] via [voiceStateProvider].
 library;
 
 import 'dart:async';
@@ -11,17 +11,6 @@ import 'package:kompas/providers/voice_provider.dart';
 import 'package:kompas/utils/speech_permissions.dart';
 import 'package:kompas/widgets/listening_indicator.dart';
 
-/// Reusable microphone button for any text field.
-///
-/// Usage:
-/// ```dart
-/// TextField(
-///   controller: controller,
-///   decoration: InputDecoration(
-///     suffixIcon: VoiceInputButton(controller: controller),
-///   ),
-/// )
-/// ```
 class VoiceInputButton extends ConsumerStatefulWidget {
   const VoiceInputButton({
     super.key,
@@ -35,21 +24,11 @@ class VoiceInputButton extends ConsumerStatefulWidget {
   });
 
   final TextEditingController controller;
-
-  /// Called whenever live transcription updates the field.
   final ValueChanged<String>? onTextUpdated;
-
-  /// Called after stop with the final recognized text.
   final ValueChanged<String>? onListeningStopped;
-
   final bool enabled;
   final String? tooltip;
-
-  /// When true (default), recognition replaces the field contents.
-  /// When false, recognized text is appended after a space.
   final bool replaceExisting;
-
-  /// Shows a bottom sheet with stop / cancel while listening.
   final bool showListeningSheet;
 
   @override
@@ -88,21 +67,27 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton>
     }
 
     _baseline = widget.replaceExisting ? '' : widget.controller.text.trim();
-    await voice.startListening();
-    final after = ref.read(voiceStateProvider);
-
-    if (!mounted) return;
-
-    if (after.hasError) {
-      await _handleError(after);
+    if (widget.showListeningSheet) {
+      _openListeningSheet();
+    }
+    unawaited(_pulse.repeat(reverse: true));
+    try {
+      await voice.startListening();
+    } catch (_) {
+      _pulse.stop();
+      _pulse.value = 0;
+      if (_sheetOpen && mounted) {
+        unawaited(Navigator.of(context).maybePop());
+      }
+      final after = ref.read(voiceStateProvider);
+      if (after.hasError) await _handleError(after);
       return;
     }
 
-    if (after.isListening) {
-      unawaited(_pulse.repeat(reverse: true));
-      if (widget.showListeningSheet) {
-        _openListeningSheet();
-      }
+    final after = ref.read(voiceStateProvider);
+    if (!mounted) return;
+    if (after.hasError) {
+      await _handleError(after);
     }
   }
 
@@ -143,16 +128,12 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton>
     } else {
       next = '$_baseline $trimmed';
     }
-    if (widget.controller.text == next) {
-      if (notifyStopped) {
-        widget.onListeningStopped?.call(next);
-      }
-      return;
+    if (widget.controller.text != next) {
+      widget.controller
+        ..text = next
+        ..selection = TextSelection.collapsed(offset: next.length);
+      widget.onTextUpdated?.call(next);
     }
-    widget.controller
-      ..text = next
-      ..selection = TextSelection.collapsed(offset: next.length);
-    widget.onTextUpdated?.call(next);
     if (notifyStopped) {
       widget.onListeningStopped?.call(next);
     }
@@ -185,6 +166,13 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton>
         return Consumer(
           builder: (context, ref, _) {
             final voice = ref.watch(voiceStateProvider);
+            final label = switch (voice.status) {
+              VoiceStatus.downloading =>
+                'Скачиваю модель… ${(voice.downloadProgress * 100).round()}%',
+              VoiceStatus.processing => 'Распознаю русский…',
+              VoiceStatus.initializing => 'Готовлю распознавание…',
+              _ => voice.isListening ? 'Слушаю…' : 'Обрабатываю…',
+            };
             return Padding(
               padding: const EdgeInsets.fromLTRB(
                 CompassSpacing.lg,
@@ -198,12 +186,16 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton>
                   const CompassSheetHandle(),
                   ListeningIndicator(
                     listening: voice.isListening,
-                    label: voice.isListening ? 'Слушаю…' : 'Обрабатываю…',
+                    label: label,
                   ),
+                  if (voice.status == VoiceStatus.downloading) ...[
+                    const SizedBox(height: CompassSpacing.md),
+                    LinearProgressIndicator(value: voice.downloadProgress),
+                  ],
                   const SizedBox(height: CompassSpacing.md),
                   Text(
                     voice.liveText.isEmpty
-                        ? 'Говорите на русском'
+                        ? 'Говорите по-русски'
                         : voice.liveText,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleMedium,
@@ -221,7 +213,10 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton>
                       Expanded(
                         child: CompassPrimaryButton(
                           label: 'Готово',
-                          onPressed: _stop,
+                          onPressed: voice.isBusy &&
+                                  voice.status != VoiceStatus.listening
+                              ? null
+                              : _stop,
                         ),
                       ),
                     ],

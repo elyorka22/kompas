@@ -8,7 +8,9 @@ import 'package:kompas/domain/enums/misc_enums.dart';
 import 'package:kompas/features/ai_adapter/data/stored_key_ai_adapter.dart';
 import 'package:kompas/features/settings/providers/settings_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
+import 'package:kompas/models/voice_state.dart';
 import 'package:kompas/providers/voice_provider.dart';
+import 'package:kompas/speech/speech_model_catalog.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -210,11 +212,155 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: CompassSpacing.md),
+              const _SpeechRecognitionCard(),
             ],
           );
         },
         loading: () => Center(child: Text(l10n.loading)),
         error: (error, _) => Center(child: Text('$error')),
+      ),
+    );
+  }
+}
+
+class _SpeechRecognitionCard extends ConsumerStatefulWidget {
+  const _SpeechRecognitionCard();
+
+  @override
+  ConsumerState<_SpeechRecognitionCard> createState() =>
+      _SpeechRecognitionCardState();
+}
+
+class _SpeechRecognitionCardState extends ConsumerState<_SpeechRecognitionCard> {
+  bool _busy = false;
+  String? _statusLine;
+
+  Future<void> _refreshStatus() async {
+    final engine = ref.read(speechEngineProvider);
+    final id = ref.read(speechModelIdProvider);
+    final profile = SpeechModelCatalog.byId(id);
+    final downloaded = await engine.isModelDownloaded(id);
+    final bytes = await engine.modelBytesOnDisk(id);
+    if (!mounted) return;
+    final size = bytes == null
+        ? profile.sizeLabel
+        : '${(bytes / (1024 * 1024)).toStringAsFixed(0)} MB';
+    setState(() {
+      _statusLine = downloaded
+          ? '${KompasL10n.of(context).speechModelDownloaded} · $size'
+          : '${KompasL10n.of(context).speechModelMissing} · ${profile.sizeLabel}';
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refreshStatus());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = KompasL10n.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final modelId = ref.watch(speechModelIdProvider);
+    final voice = ref.watch(voiceStateProvider);
+
+    ref.listen(speechModelIdProvider, (_, __) => _refreshStatus());
+
+    return CompassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.speechSection, style: textTheme.titleLarge),
+          const SizedBox(height: CompassSpacing.sm),
+          Text(l10n.speechEngineLabel, style: textTheme.bodyMedium),
+          const SizedBox(height: CompassSpacing.xs),
+          Text(l10n.speechRussianOnlyHint, style: textTheme.bodySmall),
+          const SizedBox(height: CompassSpacing.md),
+          Text(l10n.speechModelLabel, style: textTheme.titleMedium),
+          const SizedBox(height: CompassSpacing.sm),
+          SegmentedButton<SpeechModelId>(
+            segments: [
+              ButtonSegment(
+                value: SpeechModelId.smallQ51,
+                label: Text(l10n.speechModelSmall),
+              ),
+              ButtonSegment(
+                value: SpeechModelId.baseQ51,
+                label: Text(l10n.speechModelBase),
+              ),
+            ],
+            selected: {modelId},
+            onSelectionChanged: _busy
+                ? null
+                : (selection) async {
+                    setState(() => _busy = true);
+                    try {
+                      await ref
+                          .read(speechModelIdProvider.notifier)
+                          .select(selection.first);
+                      await _refreshStatus();
+                    } finally {
+                      if (mounted) setState(() => _busy = false);
+                    }
+                  },
+          ),
+          const SizedBox(height: CompassSpacing.md),
+          if (_statusLine != null) Text(_statusLine!, style: textTheme.bodySmall),
+          if (voice.status == VoiceStatus.downloading) ...[
+            const SizedBox(height: CompassSpacing.sm),
+            LinearProgressIndicator(value: voice.downloadProgress),
+          ],
+          const SizedBox(height: CompassSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: CompassSecondaryButton(
+                  label: l10n.speechDownloadModel,
+                  onPressed: _busy
+                      ? null
+                      : () async {
+                          setState(() => _busy = true);
+                          try {
+                            await ref.read(speechEngineProvider).downloadModel(
+                                  modelId: modelId,
+                                );
+                            await ref.read(speechEngineProvider).loadModel(
+                                  modelId: modelId,
+                                );
+                            await _refreshStatus();
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            CompassSnackbars.show(context, message: '$e');
+                          } finally {
+                            if (mounted) setState(() => _busy = false);
+                          }
+                        },
+                ),
+              ),
+              const SizedBox(width: CompassSpacing.sm),
+              Expanded(
+                child: CompassSecondaryButton(
+                  label: l10n.speechDeleteModel,
+                  onPressed: _busy
+                      ? null
+                      : () async {
+                          setState(() => _busy = true);
+                          try {
+                            await ref
+                                .read(speechEngineProvider)
+                                .deleteModel(modelId);
+                            await _refreshStatus();
+                          } finally {
+                            if (mounted) setState(() => _busy = false);
+                          }
+                        },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

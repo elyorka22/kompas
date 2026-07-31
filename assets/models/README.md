@@ -1,9 +1,9 @@
-# Place the offline Vosk Russian model zip here:
+# Speech models are NOT bundled in the APK.
 #
-#   vosk-model-small-ru-0.22.zip
+# On first launch Compass downloads Russian Whisper.cpp models into
+# application support storage via SpeechEngine / ModelManager:
 #
-# Download:
-#   ./scripts/download_vosk_model.sh
+#   ggml-small-q5_1.bin  (default)
+#   ggml-base-q5_1.bin   (fallback)
 #
-# Official mirror:
-#   https://alphacephei.com/vosk/models/vosk-model-small-ru-0.22.zip
+# See lib/speech/speech_model_catalog.dart

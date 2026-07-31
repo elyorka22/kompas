@@ -1,54 +1,112 @@
-/// Riverpod wiring for the global [VoiceInputService] singleton.
+/// Riverpod wiring for the global [SpeechEngine] (Whisper behind the façade).
 library;
+
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kompas/models/voice_state.dart';
-import 'package:kompas/services/voice_input_service.dart';
+import 'package:kompas/speech/speech_engine.dart';
+import 'package:kompas/speech/speech_model_catalog.dart';
+import 'package:kompas/speech/whisper_speech_engine.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kAutoSendKey = 'voice_auto_send_after_recognition';
 
-final voiceInputServiceProvider = Provider<VoiceInputService>((ref) {
-  final service = VoiceInputService.instance;
-  ref.onDispose(() {
-    // Keep native model warm for the process lifetime — do not dispose here.
-  });
-  return service;
+final speechEngineProvider = Provider<SpeechEngine>((ref) {
+  return WhisperSpeechEngine.instance;
 });
 
-/// Live [VoiceState] stream for widgets (mic button, listening indicator).
 final voiceStateProvider =
     StateNotifierProvider<VoiceStateNotifier, VoiceState>((ref) {
-  return VoiceStateNotifier(ref.watch(voiceInputServiceProvider));
+  return VoiceStateNotifier(ref.watch(speechEngineProvider));
 });
 
 class VoiceStateNotifier extends StateNotifier<VoiceState> {
-  VoiceStateNotifier(this._service) : super(_service.state) {
-    _service.addListener(_onService);
+  VoiceStateNotifier(this._engine) : super(const VoiceState()) {
+    _statusSub = _engine.statusStream.listen(_onStatus);
+    _partialSub = _engine.partialTextStream.listen((text) {
+      state = state.copyWith(partialText: text, committedText: text);
+    });
+    _syncFromEngine();
   }
 
-  final VoiceInputService _service;
+  final SpeechEngine _engine;
+  StreamSubscription<SpeechEngineStatus>? _statusSub;
+  StreamSubscription<String>? _partialSub;
 
-  void _onService(VoiceState next) {
-    state = next;
+  void _syncFromEngine() {
+    state = state.copyWith(
+      status: _mapStatus(_engine.status),
+      isModelLoaded: _engine.isModelLoaded,
+      errorMessage: _engine.lastError,
+      downloadProgress: _engine.downloadProgress,
+      clearError: _engine.lastError == null,
+    );
   }
 
-  Future<void> initialize() => _service.initialize();
+  void _onStatus(SpeechEngineStatus status) {
+    state = state.copyWith(
+      status: _mapStatus(status),
+      isModelLoaded: _engine.isModelLoaded,
+      errorMessage: _engine.lastError,
+      downloadProgress: _engine.downloadProgress,
+      clearError: status != SpeechEngineStatus.error,
+    );
+  }
 
-  Future<void> startListening() => _service.startListening();
+  VoiceStatus _mapStatus(SpeechEngineStatus status) {
+    return switch (status) {
+      SpeechEngineStatus.idle => VoiceStatus.idle,
+      SpeechEngineStatus.checkingModel ||
+      SpeechEngineStatus.loadingModel =>
+        VoiceStatus.initializing,
+      SpeechEngineStatus.downloading => VoiceStatus.downloading,
+      SpeechEngineStatus.ready => VoiceStatus.ready,
+      SpeechEngineStatus.listening => VoiceStatus.listening,
+      SpeechEngineStatus.processing => VoiceStatus.processing,
+      SpeechEngineStatus.error => VoiceStatus.error,
+    };
+  }
 
-  Future<String> stopListening() => _service.stopListening();
+  Future<void> initialize() => _engine.initialize();
 
-  Future<void> cancelListening() => _service.cancelListening();
+  Future<void> startListening() async {
+    state = state.copyWith(
+      partialText: '',
+      committedText: '',
+      clearError: true,
+    );
+    await _engine.startListening();
+  }
+
+  Future<String> stopListening() async {
+    final result = await _engine.stopListening();
+    final text = result.text;
+    state = state.copyWith(
+      committedText: text,
+      partialText: '',
+      status: VoiceStatus.ready,
+    );
+    return text;
+  }
+
+  Future<void> cancelListening() async {
+    await _engine.cancel();
+    state = state.copyWith(
+      partialText: '',
+      committedText: '',
+      status: _mapStatus(_engine.status),
+    );
+  }
 
   @override
   void dispose() {
-    _service.removeListener(_onService);
+    _statusSub?.cancel();
+    _partialSub?.cancel();
     super.dispose();
   }
 }
 
-/// Optional Coach setting: send the message when recognition stops.
 final voiceAutoSendProvider =
     StateNotifierProvider<VoiceAutoSendNotifier, bool>((ref) {
   return VoiceAutoSendNotifier();
@@ -62,13 +120,27 @@ class VoiceAutoSendNotifier extends StateNotifier<bool> {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     state = prefs.getBool(_kAutoSendKey) ?? false;
-    VoiceInputService.instance.autoSendAfterRecognition = state;
   }
 
   Future<void> setEnabled(bool value) async {
     state = value;
-    VoiceInputService.instance.autoSendAfterRecognition = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_kAutoSendKey, value);
+  }
+}
+
+final speechModelIdProvider =
+    StateNotifierProvider<SpeechModelIdNotifier, SpeechModelId>((ref) {
+  return SpeechModelIdNotifier(ref.watch(speechEngineProvider));
+});
+
+class SpeechModelIdNotifier extends StateNotifier<SpeechModelId> {
+  SpeechModelIdNotifier(this._engine) : super(_engine.activeModelId);
+
+  final SpeechEngine _engine;
+
+  Future<void> select(SpeechModelId id) async {
+    state = id;
+    await _engine.setActiveModel(id);
   }
 }

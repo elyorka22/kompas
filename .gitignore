@@ -46,5 +46,6 @@ app.*.map.json
 .env.local
 secrets/
 
-# Large offline STT models (download via scripts/download_vosk_model.sh)
+# Whisper GGML models must not be committed (downloaded at runtime).
+ggml-*.bin
 assets/models/*.zip

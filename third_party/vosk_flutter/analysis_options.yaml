@@ -1,9 +1,0 @@
-# Keep vendored analysis self-contained (no very_good_analysis dependency).
-include: package:flutter_lints/flutter.yaml
-
-analyzer:
-  exclude:
-    - lib/src/cli/options.g.dart
-  errors:
-    # Promoted locals still trip this lint in older plugin style.
-    unnecessary_non_null_assertion: ignore
