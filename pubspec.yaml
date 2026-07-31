@@ -51,6 +51,9 @@ dev_dependencies:
 dependency_overrides:
   # Keep Flutter 3.22.3 / Dart 3.4.4 resolvable with whisper_flutter_new.
   ffi: 2.1.2
+  # record 5.2.1 pulls interface 1.3.0 where startStream is abstract, but
+  # record_linux 0.7.2 (and other platform impls) do not implement it yet.
+  record_platform_interface: 1.2.0
 
 flutter:
   uses-material-design: true
