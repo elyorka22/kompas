@@ -3,6 +3,9 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - '**/*.g.dart'
+    # Vendored plugin is analyzed via its own analysis_options.yaml when needed;
+    # keep app CI focused on Kompas sources.
+    - third_party/**
   errors:
     invalid_annotation_target: ignore
 

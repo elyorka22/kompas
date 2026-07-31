@@ -810,12 +810,12 @@ class VoskLibrary {
           .asFunction<int Function(ffi.Pointer<VoskBatchRecognizer>)>();
 }
 
-class VoskModel extends ffi.Opaque {}
+final class VoskModel extends ffi.Opaque {}
 
-class VoskSpkModel extends ffi.Opaque {}
+final class VoskSpkModel extends ffi.Opaque {}
 
-class VoskRecognizer extends ffi.Opaque {}
+final class VoskRecognizer extends ffi.Opaque {}
 
-class VoskBatchModel extends ffi.Opaque {}
+final class VoskBatchModel extends ffi.Opaque {}
 
-class VoskBatchRecognizer extends ffi.Opaque {}
+final class VoskBatchRecognizer extends ffi.Opaque {}
