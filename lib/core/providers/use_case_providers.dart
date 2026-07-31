@@ -31,6 +31,7 @@ import 'package:kompas/features/onboarding/domain/usecases/complete_onboarding.d
 import 'package:kompas/features/profile/domain/usecases/get_active_user.dart';
 import 'package:kompas/features/profile/domain/usecases/update_user_profile.dart';
 import 'package:kompas/features/progress/domain/usecases/get_user_statistics.dart';
+import 'package:kompas/features/ai_adapter/domain/usecases/send_coach_turn.dart';
 import 'package:kompas/features/prompt_engine/domain/usecases/build_prompt.dart';
 import 'package:kompas/features/prompt_engine/domain/usecases/build_prompt_from_coach.dart';
 import 'package:kompas/features/settings/domain/usecases/get_settings.dart';
@@ -224,4 +225,15 @@ final buildPromptProvider = Provider<BuildPrompt>((ref) {
 
 final buildPromptFromCoachProvider = Provider<BuildPromptFromCoach>((ref) {
   return BuildPromptFromCoach(ref.watch(promptEngineServiceProvider));
+});
+
+final sendCoachTurnProvider = Provider<SendCoachTurn>((ref) {
+  return SendCoachTurn(
+    aiAdapter: ref.watch(aiAdapterProvider),
+    conversations: ref.watch(conversationRepositoryProvider),
+    generateStrategy: ref.watch(generateLearningStrategyProvider),
+    recommendGoal: ref.watch(coachRecommendConversationGoalProvider),
+    buildPrompt: ref.watch(buildPromptFromCoachProvider),
+    memory: ref.watch(memoryEngineServiceProvider),
+  );
 });

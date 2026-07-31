@@ -32,7 +32,7 @@ class SessionCompleteScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(CompassSpacing.lg),
               child: CompassPrimaryButton(
                 label: l10n.backHome,
-                onPressed: () => context.go(AppRoutes.home),
+                onPressed: () => context.go(AppRoutes.coach),
               ),
             ),
           ),
@@ -140,7 +140,7 @@ class SessionCompleteScreen extends ConsumerWidget {
                 const SizedBox(height: CompassSpacing.xl),
                 CompassPrimaryButton(
                   label: l10n.backToDashboard,
-                  onPressed: () => context.go(AppRoutes.home),
+                  onPressed: () => context.go(AppRoutes.coach),
                 ),
                 const SizedBox(height: CompassSpacing.sm),
                 CompassGhostButton(

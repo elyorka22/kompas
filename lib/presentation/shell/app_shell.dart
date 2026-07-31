@@ -34,12 +34,7 @@ class AppShell extends StatelessWidget {
           onDestinationSelected: navigationShell.goBranch,
           destinations: [
             CompassBottomDestination(
-              label: l10n.navHome,
-              icon: CompassIcons.home,
-              selectedIcon: CompassIcons.homeFilled,
-            ),
-            CompassBottomDestination(
-              label: l10n.navPractice,
+              label: l10n.navCoach,
               icon: CompassIcons.practice,
               selectedIcon: CompassIcons.practiceFilled,
             ),
@@ -57,6 +52,11 @@ class AppShell extends StatelessWidget {
               label: l10n.navProgress,
               icon: CompassIcons.progress,
               selectedIcon: CompassIcons.progressFilled,
+            ),
+            CompassBottomDestination(
+              label: l10n.navMissions,
+              icon: CompassIcons.home,
+              selectedIcon: CompassIcons.homeFilled,
             ),
           ],
         ),

@@ -9,38 +9,41 @@ abstract final class DefaultExerciseCatalog {
     Exercise(
       id: 'ex_word_resilience',
       code: 'explain_word.resilience',
-      title: 'Explain “resilience”',
+      title: 'ехать / ездить',
       prompt:
-          'Explain the word “resilience” as if teaching a friend. '
-          'Give the meaning, one example from life, and one sentence using it.',
+          'Объясните разницу между «ехать» и «ездить». '
+          'Приведите по одному примеру из жизни и скажите 2 предложения вслух.',
       mode: PracticeMode.explainWord,
-      primarySkillId: SkillIds.vocabulary,
+      primarySkillId: SkillIds.descriptions,
       secondarySkillIds: [SkillIds.explanation],
       difficulty: ExerciseDifficulty.starter,
-      coachHint: 'Avoid translating only — teach through examples.',
+      coachHint: 'Не переводите дословно — объясните через ситуации.',
     ),
     Exercise(
       id: 'ex_word_curious',
       code: 'explain_word.curious',
-      title: 'Explain “curious”',
+      title: 'сказать / говорить',
       prompt:
-          'Explain “curious”. Contrast it with “nosy” if you can. '
-          'Use it in two short spoken sentences.',
+          'Объясните разницу «сказать» и «говорить». '
+          'Используйте оба глагола в коротком диалоге.',
       mode: PracticeMode.explainWord,
       primarySkillId: SkillIds.vocabulary,
       secondarySkillIds: [SkillIds.explanation],
       difficulty: ExerciseDifficulty.core,
+      coachHint: 'Вид глагола важнее перевода.',
     ),
     Exercise(
       id: 'ex_word_commitment',
       code: 'explain_word.commitment',
-      title: 'Explain “commitment”',
+      title: 'думать / считать',
       prompt:
-          'Explain “commitment”. Give a workplace example and a personal example.',
+          'Объясните, когда говорят «я думаю» и «я считаю». '
+          'Дайте рабочий и личный пример.',
       mode: PracticeMode.explainWord,
-      primarySkillId: SkillIds.vocabulary,
-      secondarySkillIds: [SkillIds.explanation, SkillIds.naturalSpeech],
+      primarySkillId: SkillIds.explanation,
+      secondarySkillIds: [SkillIds.naturalSpeech],
       difficulty: ExerciseDifficulty.stretch,
+      coachHint: '«Считать» — мнение; «думать» — процесс.',
     ),
 
     // ── Continue a story ────────────────────────────────────────────────

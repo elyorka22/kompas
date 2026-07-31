@@ -42,16 +42,57 @@ class KompasL10n {
   String get saving => _t(ru: 'Сохранение…', uz: 'Saqlanmoqda…');
 
   // ── Navigation ────────────────────────────────────────────────────────
-  String get navHome => _t(ru: 'Главная', uz: 'Asosiy');
+  String get navHome => _t(ru: 'Сегодня', uz: 'Bugun');
+  String get navCoach => _t(ru: 'Коуч', uz: 'Murabbiy');
   String get navPractice => _t(ru: 'Практика', uz: 'Mashq');
-  String get navNotebook => _t(ru: 'Блокнот', uz: 'Daftar');
+  String get navMissions => _t(ru: 'Миссии', uz: 'Missiyalar');
+  String get navNotebook => _t(ru: 'Выражения', uz: 'Iboralar');
   String get navSkills => _t(ru: 'Навыки', uz: 'Ko‘nikmalar');
   String get navProgress => _t(ru: 'Прогресс', uz: 'Taraqqiyot');
 
+  // ── Coach chat ────────────────────────────────────────────────────────
+  String get welcomeBack =>
+      _t(ru: 'С возвращением.', uz: 'Qaytganingiz bilan.');
+  String get todayTrainSpokenRussian => _t(
+        ru: 'Сегодня потренируем разговорный русский.',
+        uz: 'Bugun og‘zaki rus tilini mashq qilamiz.',
+      );
+  String get todaysGoal => _t(ru: 'Цель на сегодня', uz: 'Bugungi maqsad');
+  String get todayRussianFocus => _t(
+        ru: 'Говорите естественно и не переводите слово в слово.',
+        uz: 'Tabiiy gapiring va so‘zma-so‘z tarjima qilmang.',
+      );
+  String goalUseExpressions(String expressions) => _t(
+        ru: 'Используйте естественно: $expressions',
+        uz: 'Tabiiy ishlating: $expressions',
+      );
+  String get suggestedTopics =>
+      _t(ru: 'Темы для разговора', uz: 'Suhbat mavzulari');
+  String get quickSuggestions =>
+      _t(ru: 'Быстрый старт', uz: 'Tezkor start');
+  String get chatHint =>
+      _t(ru: 'Напишите на русском…', uz: 'Ruscha yozing…');
+  String get voiceSoon =>
+      _t(ru: 'Голос скоро', uz: 'Ovoz tez orada');
+  String get attachSoon =>
+      _t(ru: 'Вложения скоро', uz: 'Ilovalar tez orada');
+  String get coachTyping =>
+      _t(ru: 'Коуч печатает…', uz: 'Murabbiy yozmoqda…');
+  String get openaiApiKey =>
+      _t(ru: 'OpenAI API ключ', uz: 'OpenAI API kaliti');
+  String get openaiApiKeyHint => _t(
+        ru: 'Ключ хранится только на этом устройстве',
+        uz: 'Kalit faqat shu qurilmada saqlanadi',
+      );
+  String get saveApiKey => _t(ru: 'Сохранить ключ', uz: 'Kalitni saqlash');
+  String get apiKeySaved =>
+      _t(ru: 'Ключ сохранён', uz: 'Kalit saqlandi');
+  String get aiSection => _t(ru: 'ИИ-коуч', uz: 'AI murabbiy');
+
   // ── Splash ────────────────────────────────────────────────────────────
   String get splashTagline => _t(
-        ru: 'Ведёт вас в разговорной практике',
-        uz: 'Suhbat amaliyotida yo‘l ko‘rsatadi',
+        ru: 'AI-коуч разговорного русского',
+        uz: 'Og‘zaki rus tili uchun AI murabbiy',
       );
 
   // ── Settings ──────────────────────────────────────────────────────────
@@ -410,10 +451,10 @@ class KompasL10n {
       _t(ru: 'Инсайты коуча', uz: 'Murabbiy tushunchalari');
 
   // ── Notebook / Skills shell ───────────────────────────────────────────
-  String get notebookTitle => _t(ru: 'База знаний', uz: 'Bilim bazasi');
+  String get notebookTitle => _t(ru: 'Русские выражения', uz: 'Rus iboralari');
   String get notebookSubtitle => _t(
-        ru: 'Слова, выражения, идиомы и ошибки — всё под рукой.',
-        uz: 'So‘zlar, iboralar, idiomalar va xatolar — qo‘l ostida.',
+        ru: 'Идиомы, сленг, грамматика и ошибки — ваша база.',
+        uz: 'Idiomalar, sleng, grammatika va xatolar — bazangiz.',
       );
   String get notebookEmpty => _t(
         ru:
@@ -434,10 +475,10 @@ class KompasL10n {
   String get notebookFilterFavorites =>
       _t(ru: 'Избранное', uz: 'Sevimlilar');
   String get notebookFilterNotes => _t(ru: 'Заметки', uz: 'Eslatmalar');
-  String get skillTreeTitle => _t(ru: 'Навыки', uz: 'Ko‘nikmalar');
+  String get skillTreeTitle => _t(ru: 'Русский путь', uz: 'Rus yo‘li');
   String get skillTreeSubtitle => _t(
-        ru: 'Живой путь — от закрытых к освоенным.',
-        uz: 'Jonli yo‘l — yopiqdan o‘zlashtirilgangacha.',
+        ru: 'Разговор, падежи, аспекты, движение, идиомы.',
+        uz: 'Suhbat, kelishiklar, aspektlar, harakat, idiomalar.',
       );
   String get completeOnboardingForPath => _t(
         ru: 'Завершите онбординг, чтобы открыть путь.',

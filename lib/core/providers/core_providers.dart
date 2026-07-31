@@ -13,6 +13,8 @@ import 'package:kompas/data/repositories/isar_speech_analysis_repository.dart';
 import 'package:kompas/data/repositories/isar_statistics_repository.dart';
 import 'package:kompas/data/repositories/isar_user_repository.dart';
 import 'package:kompas/domain/repositories/repositories.dart';
+import 'package:kompas/features/ai_adapter/data/ai_api_key_store.dart';
+import 'package:kompas/features/ai_adapter/data/stored_key_ai_adapter.dart';
 import 'package:kompas/features/ai_adapter/domain/ai_adapter.dart';
 import 'package:kompas/services/audio/audio_playback_service.dart';
 import 'package:kompas/services/coach/coach_engine_service.dart';
@@ -167,6 +169,13 @@ final audioPlaybackServiceProvider = Provider<AudioPlaybackService>((ref) {
   return StubAudioPlaybackService();
 });
 
+final aiApiKeyStoreProvider = Provider<AiApiKeyStore>((ref) {
+  return AiApiKeyStore();
+});
+
 final aiAdapterProvider = Provider<AiAdapter>((ref) {
-  return const OfflineNoopAiAdapter();
+  final adapter = StoredKeyAiAdapter(ref.watch(aiApiKeyStoreProvider));
+  // Fire-and-forget availability refresh for UI gates.
+  adapter.refreshAvailability();
+  return adapter;
 });

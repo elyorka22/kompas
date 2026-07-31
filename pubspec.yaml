@@ -1,5 +1,5 @@
 name: kompas
-description: "Компас — AI Conversation Coach. Offline-first speaking practice powered by Compass Engine."
+description: "Компас — AI Conversation Coach for real Russian speaking practice."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -31,6 +31,8 @@ dependencies:
 
   # Design system typography
   google_fonts: ^6.2.1
+  http: ^1.6.0
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

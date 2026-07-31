@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kompas/design_system/design_system.dart';
+import 'package:kompas/features/conversation/presentation/screens/coach_chat_screen.dart';
 import 'package:kompas/features/conversation/presentation/screens/practice_screen.dart';
 import 'package:kompas/features/conversation/presentation/screens/session_complete_screen.dart';
 import 'package:kompas/features/conversation/presentation/screens/session_screen.dart';
@@ -48,7 +49,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return loggingIn ? null : AppRoutes.onboarding;
       }
       if (atSplash) {
-        return AppRoutes.home;
+        return AppRoutes.coach;
       }
       if (loggingIn) {
         return AppRoutes.welcomeMission;
@@ -101,6 +102,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+      GoRoute(
+        path: AppRoutes.home,
+        builder: (context, state) => const HomeScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AppShell(navigationShell: navigationShell);
@@ -109,16 +114,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.home,
-                builder: (context, state) => const HomeScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoutes.practice,
-                builder: (context, state) => const PracticeScreen(),
+                path: AppRoutes.coach,
+                builder: (context, state) => const CoachChatScreen(),
               ),
             ],
           ),
@@ -143,6 +140,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutes.progress,
                 builder: (context, state) => const ProgressScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.practice,
+                builder: (context, state) => const PracticeScreen(),
               ),
             ],
           ),

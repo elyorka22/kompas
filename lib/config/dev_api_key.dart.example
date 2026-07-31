@@ -1,0 +1,7 @@
+/// Template for [DevApiKey].
+///
+/// For personal Kompas builds the real key lives in `dev_api_key.dart`
+/// so GitHub Actions APK builds work without a separate server.
+abstract final class DevApiKey {
+  static const value = '';
+}

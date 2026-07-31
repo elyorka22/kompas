@@ -77,7 +77,7 @@ class WelcomeMissionScreen extends ConsumerWidget {
                   ),
                   CompassPrimaryButton(
                     label: l10n.openDashboard,
-                    onPressed: () => context.go(AppRoutes.home),
+                    onPressed: () => context.go(AppRoutes.coach),
                   ),
                   const SizedBox(height: CompassSpacing.md),
                 ],

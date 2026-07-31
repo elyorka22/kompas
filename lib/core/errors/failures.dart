@@ -37,6 +37,11 @@ final class UnsupportedFailure extends Failure {
   const UnsupportedFailure(super.message, {super.cause});
 }
 
+/// Remote network / LLM call failed.
+final class NetworkFailure extends Failure {
+  const NetworkFailure(super.message, {super.cause});
+}
+
 /// Catch-all for unexpected errors that escaped typed handling.
 final class UnexpectedFailure extends Failure {
   const UnexpectedFailure(super.message, {super.cause});

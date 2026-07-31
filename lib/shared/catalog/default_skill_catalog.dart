@@ -15,30 +15,30 @@ abstract final class SkillIds {
   static const pronunciation = 'skill_pronunciation';
 }
 
-/// Seed catalog for Skill Tree — Compass Engine v1.
+/// Seed catalog — Russian conversation coach path.
 abstract final class DefaultSkillCatalog {
   static const List<Skill> skills = [
     Skill(
       id: SkillIds.conversation,
       code: 'conversation.core',
-      title: 'Conversation',
-      description: 'Keep a natural spoken exchange moving with clear turns.',
+      title: 'Разговор',
+      description: 'Живой обмен репликами на русском без перевода слово в слово.',
       category: SkillCategory.conversation,
       order: 1,
     ),
     Skill(
       id: SkillIds.naturalSpeech,
       code: 'natural_speech.core',
-      title: 'Natural Speech',
-      description: 'Speak continuously with fewer freezes and fillers.',
+      title: 'Живая речь',
+      description: 'Говорить дольше, с естественными связками и меньше пауз.',
       category: SkillCategory.naturalSpeech,
       order: 2,
     ),
     Skill(
       id: SkillIds.vocabulary,
       code: 'vocabulary.core',
-      title: 'Vocabulary',
-      description: 'Explain and use words precisely in context.',
+      title: 'Аспекты глаголов',
+      description: 'Совершенный и несовершенный вид: сказать/говорить, сделать/делать.',
       category: SkillCategory.vocabulary,
       order: 3,
       prerequisiteSkillIds: [SkillIds.conversation],
@@ -46,8 +46,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.explanation,
       code: 'explanation.core',
-      title: 'Explanation',
-      description: 'Teach ideas clearly as if helping a beginner.',
+      title: 'Грамматика',
+      description: 'Частицы, связки и точные конструкции в живой речи.',
       category: SkillCategory.explanation,
       order: 4,
       prerequisiteSkillIds: [SkillIds.vocabulary],
@@ -55,8 +55,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.descriptions,
       code: 'descriptions.core',
-      title: 'Descriptions',
-      description: 'Describe scenes, objects and feelings with detail.',
+      title: 'Глаголы движения',
+      description: 'ехать/ездить, идти/ходить и направление движения.',
       category: SkillCategory.descriptions,
       order: 5,
       prerequisiteSkillIds: [SkillIds.conversation],
@@ -64,8 +64,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.storytelling,
       code: 'storytelling.core',
-      title: 'Storytelling',
-      description: 'Narrate events with beginning, middle and end.',
+      title: 'Истории',
+      description: 'Рассказывать события по-русски с началом, серединой и концом.',
       category: SkillCategory.storytelling,
       order: 6,
       prerequisiteSkillIds: [SkillIds.naturalSpeech],
@@ -73,8 +73,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.argumentation,
       code: 'argumentation.core',
-      title: 'Argumentation',
-      description: 'State a position and support it with reasons.',
+      title: 'Падежи',
+      description: 'Родительный, винительный, творительный в реальных фразах.',
       category: SkillCategory.argumentation,
       order: 7,
       prerequisiteSkillIds: [SkillIds.explanation],
@@ -82,8 +82,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.idioms,
       code: 'idioms.core',
-      title: 'Idioms',
-      description: 'Explain idioms and use them naturally.',
+      title: 'Идиомы',
+      description: 'Русские идиомы, сленг и устойчивые выражения.',
       category: SkillCategory.idioms,
       order: 8,
       prerequisiteSkillIds: [SkillIds.vocabulary, SkillIds.explanation],
@@ -91,8 +91,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.listening,
       code: 'listening.future',
-      title: 'Listening',
-      description: 'Coming later — comprehension from spoken input.',
+      title: 'Слушание',
+      description: 'Позже — понимание живой русской речи на слух.',
       category: SkillCategory.listening,
       order: 90,
       isFuture: true,
@@ -100,8 +100,8 @@ abstract final class DefaultSkillCatalog {
     Skill(
       id: SkillIds.pronunciation,
       code: 'pronunciation.future',
-      title: 'Pronunciation',
-      description: 'Coming later — clarity of sounds and stress.',
+      title: 'Произношение',
+      description: 'Позже — ударение, редукция и ясность звуков.',
       category: SkillCategory.pronunciation,
       order: 91,
       isFuture: true,

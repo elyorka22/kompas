@@ -1,5 +1,6 @@
 import 'package:kompas/core/errors/failures.dart';
 import 'package:kompas/core/errors/result.dart';
+import 'package:kompas/domain/entities/prompt_bundle.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
 
 /// Future LLM / remote coach boundary.
@@ -26,6 +27,9 @@ class AiCoachRequest {
     required this.nativeLanguageCode,
     required this.recentMessages,
     this.userUtterance,
+    this.promptBundle,
+    this.systemPrompt,
+    this.developerPrompt,
   });
 
   final String sessionId;
@@ -34,6 +38,11 @@ class AiCoachRequest {
   final String nativeLanguageCode;
   final List<String> recentMessages;
   final String? userUtterance;
+
+  /// Full Prompt Engine package — preferred over raw history alone.
+  final PromptBundle? promptBundle;
+  final String? systemPrompt;
+  final String? developerPrompt;
 }
 
 class AiCoachReply {
@@ -59,7 +68,7 @@ class OfflineNoopAiAdapter implements AiAdapter {
   ) async {
     return const Err(
       UnsupportedFailure(
-        'AI coaching is not available in Kompas 0.1. Local Compass Engine guides practice instead.',
+        'AI coaching is not available without an API key. Add it in Settings.',
       ),
     );
   }
@@ -71,7 +80,7 @@ class OfflineNoopAiAdapter implements AiAdapter {
   }) async {
     return const Err(
       UnsupportedFailure(
-        'AI expression suggestions require a later AI Adapter release.',
+        'AI expression suggestions require a configured AI Adapter.',
       ),
     );
   }

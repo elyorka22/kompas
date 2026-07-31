@@ -25,7 +25,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   int _page = 0;
   AppLanguage _native = AppLanguage.ru;
-  AppLanguage _target = AppLanguage.en;
+  AppLanguage _target = AppLanguage.ru;
   String _goalKey = KompasL10n.goalKeyWork;
   int _minutes = 10;
   bool _reminders = true;
