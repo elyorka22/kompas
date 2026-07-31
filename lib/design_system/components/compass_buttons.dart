@@ -25,17 +25,18 @@ class CompassPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final height = size == CompassButtonSize.compact ? 44.0 : 52.0;
+    final height = size == CompassButtonSize.compact ? 48.0 : 58.0;
     final enabled = onPressed != null;
-    final radius = BorderRadius.circular(CompassRadii.md);
+    final radius = BorderRadius.circular(CompassRadii.lg);
+    final iconSize = size == CompassButtonSize.compact ? 22.0 : 24.0;
 
     final labelChild = icon == null
         ? Text(label)
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 20),
-              const SizedBox(width: CompassSpacing.xs),
+              Icon(icon, size: iconSize),
+              const SizedBox(width: CompassSpacing.sm),
               Text(label),
             ],
           );
@@ -72,23 +73,24 @@ class CompassPrimaryButton extends StatelessWidget {
               boxShadow: enabled
                   ? [
                       BoxShadow(
-                        color: CompassColors.compass.withOpacity(0.22),
-                        blurRadius: 18,
-                        offset: const Offset(0, 10),
+                        color: CompassColors.compass.withOpacity(0.28),
+                        blurRadius: 22,
+                        offset: const Offset(0, 8),
                       ),
                     ]
                   : null,
             ),
             child: Center(
               child: DefaultTextStyle.merge(
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: enabled
                           ? (isDark ? CompassColors.ink : CompassColors.white)
                           : Theme.of(context)
                               .colorScheme
                               .onSurface
                               .withOpacity(0.4),
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
                     ),
                 child: IconTheme.merge(
                   data: IconThemeData(
@@ -139,8 +141,8 @@ class CompassSecondaryButton extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 20),
-              const SizedBox(width: CompassSpacing.xs),
+              Icon(icon, size: 22),
+              const SizedBox(width: CompassSpacing.sm),
               Text(label),
             ],
           );
@@ -150,11 +152,19 @@ class CompassSecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
+          minimumSize: const Size(CompassSpacing.touchTarget, 58),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
           side: BorderSide(
-            color: scheme.outline.withOpacity(0.7),
-            width: 1,
+            color: scheme.outline.withOpacity(0.85),
+            width: 1.5,
           ),
           foregroundColor: scheme.onSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CompassRadii.lg),
+          ),
+          textStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
         ),
         child: child,
       ),

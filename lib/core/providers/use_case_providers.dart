@@ -240,5 +240,6 @@ final sendCoachTurnProvider = Provider<SendCoachTurn>((ref) {
     recommendGoal: ref.watch(coachRecommendConversationGoalProvider),
     buildPrompt: ref.watch(buildPromptFromCoachProvider),
     memory: ref.watch(memoryEngineServiceProvider),
+    saveNotebookItem: ref.watch(saveNotebookItemProvider),
   );
 });

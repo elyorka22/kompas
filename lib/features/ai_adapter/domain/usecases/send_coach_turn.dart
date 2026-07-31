@@ -7,12 +7,15 @@ import 'package:kompas/domain/entities/conversation_session.dart';
 import 'package:kompas/domain/entities/personal_learning_profile.dart';
 import 'package:kompas/domain/entities/prompt_request.dart';
 import 'package:kompas/domain/enums/app_language.dart';
+import 'package:kompas/domain/enums/memory_enums.dart';
 import 'package:kompas/domain/enums/prompt_mode.dart';
 import 'package:kompas/domain/enums/session_enums.dart';
 import 'package:kompas/domain/repositories/conversation_repository.dart';
 import 'package:kompas/features/ai_adapter/domain/ai_adapter.dart';
+import 'package:kompas/features/ai_adapter/domain/notebook_save_parser.dart';
 import 'package:kompas/features/coach_engine/domain/usecases/generate_learning_strategy.dart';
 import 'package:kompas/features/coach_engine/domain/usecases/recommend_conversation_goal.dart';
+import 'package:kompas/features/notebook/domain/usecases/save_notebook_item.dart';
 import 'package:kompas/features/prompt_engine/domain/usecases/build_prompt_from_coach.dart';
 import 'package:kompas/services/memory/memory_engine_service.dart';
 
@@ -36,10 +39,12 @@ class SendCoachTurnResult {
   const SendCoachTurnResult({
     required this.userMessage,
     required this.coachMessage,
+    this.savedNotebookWords = const [],
   });
 
   final ConversationMessage userMessage;
   final ConversationMessage coachMessage;
+  final List<String> savedNotebookWords;
 }
 
 /// Orchestrates Coach + Memory + Prompt Engine + AiAdapter for one chat turn.
@@ -51,12 +56,14 @@ class SendCoachTurn extends UseCase<SendCoachTurnResult, SendCoachTurnParams> {
     required RecommendConversationGoal recommendGoal,
     required BuildPromptFromCoach buildPrompt,
     required MemoryEngineService memory,
+    required SaveNotebookItem saveNotebookItem,
   })  : _ai = aiAdapter,
         _conversations = conversations,
         _generateStrategy = generateStrategy,
         _recommendGoal = recommendGoal,
         _buildPrompt = buildPrompt,
-        _memory = memory;
+        _memory = memory,
+        _saveNotebookItem = saveNotebookItem;
 
   final AiAdapter _ai;
   final ConversationRepository _conversations;
@@ -64,6 +71,7 @@ class SendCoachTurn extends UseCase<SendCoachTurnResult, SendCoachTurnParams> {
   final RecommendConversationGoal _recommendGoal;
   final BuildPromptFromCoach _buildPrompt;
   final MemoryEngineService _memory;
+  final SaveNotebookItem _saveNotebookItem;
 
   @override
   Future<Result<SendCoachTurnResult>> call(SendCoachTurnParams params) async {
@@ -160,11 +168,42 @@ class SendCoachTurn extends UseCase<SendCoachTurnResult, SendCoachTurnParams> {
     );
     if (aiResult.isFailure) return Err(aiResult.failureOrNull!);
 
+    final rawCoach = aiResult.valueOrNull!.content;
+    final parsed = parseNotebookSaves(rawCoach);
+    final savedWords = <String>[];
+
+    for (final entry in parsed.entries) {
+      final saveResult = await _saveNotebookItem(
+        SaveNotebookItemParams(
+          userId: params.userId,
+          title: entry.word,
+          body: entry.encodeBody(),
+          type: NotebookItemType.expression,
+          sessionId: params.session.id,
+          tags: const ['vocab', 'from_chat'],
+        ),
+      );
+      if (saveResult.isSuccess) {
+        savedWords.add(entry.word);
+      }
+    }
+
+    var visible = parsed.visibleText.trim();
+    if (savedWords.isNotEmpty) {
+      final confirm = savedWords.length == 1
+          ? '✓ Добавил в блокнот: ${savedWords.first}'
+          : '✓ Добавил в блокнот: ${savedWords.join(', ')}';
+      visible = visible.isEmpty ? confirm : '$visible\n\n$confirm';
+    }
+    if (visible.isEmpty) {
+      visible = 'Готово.';
+    }
+
     final coachMessage = ConversationMessage(
       id: IdGenerator.v4(),
       sessionId: params.session.id,
       role: MessageRole.coach,
-      content: aiResult.valueOrNull!.content,
+      content: visible,
       createdAt: DateTime.now().toUtc(),
     );
     final savedCoach = await _conversations.addMessage(coachMessage);
@@ -174,6 +213,7 @@ class SendCoachTurn extends UseCase<SendCoachTurnResult, SendCoachTurnParams> {
       SendCoachTurnResult(
         userMessage: savedUser.valueOrNull!,
         coachMessage: savedCoach.valueOrNull!,
+        savedNotebookWords: savedWords,
       ),
     );
   }

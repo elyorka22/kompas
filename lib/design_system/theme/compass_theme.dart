@@ -107,12 +107,12 @@ abstract final class CompassTheme {
           foregroundColor: scheme.onPrimary,
           disabledBackgroundColor: scheme.outline.withOpacity(0.35),
           disabledForegroundColor: scheme.onSurface.withOpacity(0.4),
-          minimumSize: const Size(CompassSpacing.touchTarget, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          minimumSize: const Size(CompassSpacing.touchTarget, 58),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CompassRadii.md),
+            borderRadius: BorderRadius.circular(CompassRadii.lg),
           ),
-          textStyle: text.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+          textStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
           elevation: 0,
           shadowColor: scheme.primary.withOpacity(0.4),
         ),
@@ -120,32 +120,42 @@ abstract final class CompassTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.onSurface,
-          minimumSize: const Size(CompassSpacing.touchTarget, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          side: BorderSide(color: scheme.outline),
+          minimumSize: const Size(CompassSpacing.touchTarget, 58),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          side: BorderSide(color: scheme.outline, width: 1.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CompassRadii.md),
+            borderRadius: BorderRadius.circular(CompassRadii.lg),
           ),
-          textStyle: text.labelLarge,
+          textStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: scheme.primary,
-          minimumSize: const Size(CompassSpacing.touchTarget, 44),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          textStyle: text.labelLarge,
+          minimumSize: const Size(CompassSpacing.touchTarget, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          textStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: scheme.primary,
         foregroundColor: scheme.onPrimary,
-        elevation: 2,
-        focusElevation: 3,
-        hoverElevation: 3,
-        highlightElevation: 4,
+        elevation: 4,
+        focusElevation: 5,
+        hoverElevation: 5,
+        highlightElevation: 6,
+        extendedPadding: const EdgeInsets.symmetric(horizontal: 24),
+        extendedTextStyle:
+            text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(CompassRadii.lg),
+          borderRadius: BorderRadius.circular(CompassRadii.xl),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          minimumSize: const Size(52, 52),
+          iconSize: 26,
+          padding: const EdgeInsets.all(13),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

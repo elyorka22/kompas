@@ -272,7 +272,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                     controller: _noteController,
                     hint: l10n.capturePhraseHint,
                     maxLines: 3,
-                    suffixIcon: VoiceInputButton(controller: _noteController),
+                    suffixIcon: VoiceInputButton(
+                      controller: _noteController,
+                      compact: true,
+                    ),
                   ),
                 ],
               ),

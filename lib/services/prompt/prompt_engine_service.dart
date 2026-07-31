@@ -212,6 +212,21 @@ class PromptEngineService {
       ..writeln('- successCriteria → evaluation checklist')
       ..writeln('- followUpStrategy → closing move')
       ..writeln()
+      ..writeln('NOTEBOOK SAVE PROTOCOL (required when learner asks to save a word):')
+      ..writeln(
+        'Emit exactly this machine block (JSON on one or more lines), then a short Russian confirmation:',
+      )
+      ..writeln('<<<NOTEBOOK_SAVE>>>')
+      ..writeln(
+        '{"word":"небоскрёб","translation":"…","examples":["…","…"]}',
+      )
+      ..writeln('<<<END_NOTEBOOK_SAVE>>>')
+      ..writeln(
+        'Rules: word = Russian lemma; translation = clear gloss; '
+        'examples = 2 short natural Russian sentences using the word. '
+        'Do not put the JSON markers in normal chat unless saving.',
+      )
+      ..writeln()
       ..writeln('Conversation constraints:');
     for (final item in constraints) {
       buffer.writeln('- $item');

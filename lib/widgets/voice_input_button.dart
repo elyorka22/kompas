@@ -21,6 +21,7 @@ class VoiceInputButton extends ConsumerStatefulWidget {
     this.tooltip,
     this.replaceExisting = true,
     this.showListeningSheet = true,
+    this.compact = false,
   });
 
   final TextEditingController controller;
@@ -30,6 +31,8 @@ class VoiceInputButton extends ConsumerStatefulWidget {
   final String? tooltip;
   final bool replaceExisting;
   final bool showListeningSheet;
+  /// Smaller circle for search/input suffix slots.
+  final bool compact;
 
   @override
   ConsumerState<VoiceInputButton> createState() => _VoiceInputButtonState();
@@ -251,19 +254,42 @@ class _VoiceInputButtonState extends ConsumerState<VoiceInputButton>
       }
     });
 
+    final diameter = widget.compact ? 44.0 : 56.0;
+    final iconSize = widget.compact ? 24.0 : 28.0;
+
     return AnimatedBuilder(
       animation: _pulse,
       builder: (context, child) {
-        final scale = listening ? 1.0 + (_pulse.value * 0.12) : 1.0;
+        final scale = listening ? 1.0 + (_pulse.value * 0.1) : 1.0;
         return Transform.scale(scale: scale, child: child);
       },
-      child: IconButton(
-        tooltip: widget.tooltip ??
-            (listening ? 'Остановить' : 'Голосовой ввод'),
-        onPressed: widget.enabled ? _toggle : null,
-        icon: Icon(
-          listening ? Icons.mic_rounded : Icons.mic_none_rounded,
-          color: listening ? scheme.error : null,
+      child: Padding(
+        padding: EdgeInsets.only(left: widget.compact ? 0 : CompassSpacing.xs),
+        child: Tooltip(
+          message: widget.tooltip ??
+              (listening ? 'Остановить' : 'Голосовой ввод'),
+          child: Material(
+            color: listening
+                ? scheme.errorContainer
+                : scheme.surfaceContainerHighest,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: widget.enabled ? _toggle : null,
+              customBorder: const CircleBorder(),
+              child: SizedBox(
+                width: diameter,
+                height: diameter,
+                child: Icon(
+                  listening ? Icons.mic_rounded : Icons.mic_none_rounded,
+                  size: iconSize,
+                  color: listening
+                      ? scheme.error
+                      : scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

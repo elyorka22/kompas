@@ -481,19 +481,34 @@ class KompasL10n {
       _t(ru: 'Инсайты коуча', uz: 'Murabbiy tushunchalari');
 
   // ── Notebook / Skills shell ───────────────────────────────────────────
-  String get notebookTitle => _t(ru: 'Русские выражения', uz: 'Rus iboralari');
+  String get notebookTitle => _t(ru: 'Блокнот', uz: 'Daftar');
   String get notebookSubtitle => _t(
-        ru: 'Идиомы, сленг, грамматика и ошибки — ваша база.',
-        uz: 'Idiomalar, sleng, grammatika va xatolar — bazangiz.',
+        ru: 'Слова с переводом и примерами',
+        uz: 'Tarjima va misollar bilan so‘zlar',
       );
   String get notebookEmpty => _t(
         ru:
-            'Сохраняйте фразы во время практики. Memory Engine назначит повторения.',
+            'Пока пусто. Напишите коучу: «добавь в блокнот слово небоскрёб с переводом и примерами» — или нажмите +.',
         uz:
-            'Mashq paytida iboralarni saqlang. Memory Engine takrorlashni belgilaydi.',
+            'Hali bo‘sh. Murabbiyga yozing: «блокнотга небоскрёб so‘zini tarjima va misollar bilan qo‘sh» — yoki + ni bosing.',
       );
   String get notebookSearchHint =>
-      _t(ru: 'Поиск по базе знаний', uz: 'Bilim bazasidan qidirish');
+      _t(ru: 'Поиск слова…', uz: 'So‘z qidirish…');
+  String get notebookChatHint => _t(
+        ru:
+            'Через чат: «добавь в блокнот слово … с переводом и примерами» (можно голосом).',
+        uz:
+            'Chat orqali: «блокнотга … so‘zini tarjima va misollar bilan qo‘sh» (ovoz bilan ham).',
+      );
+  String get notebookAddWord =>
+      _t(ru: 'Добавить слово', uz: 'So‘z qo‘shish');
+  String get notebookExamples => _t(ru: 'Примеры', uz: 'Misollar');
+  String get notebookWordLabel => _t(ru: 'Слово', uz: 'So‘z');
+  String get notebookTranslationLabel =>
+      _t(ru: 'Перевод', uz: 'Tarjima');
+  String notebookExampleLabel(int n) =>
+      _t(ru: 'Пример $n', uz: 'Misol $n');
+  String get save => _t(ru: 'Сохранить', uz: 'Saqlash');
   String get notebookPinned => _t(ru: 'Закреплённые', uz: 'Qadalganlar');
   String get notebookRecent => _t(ru: 'Недавно', uz: 'Yaqinda');
   String get notebookAll => _t(ru: 'Все', uz: 'Hammasi');

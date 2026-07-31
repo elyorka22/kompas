@@ -12,6 +12,7 @@ import 'package:kompas/features/ai_adapter/domain/usecases/send_coach_turn.dart'
 import 'package:kompas/features/compass_engine/domain/usecases/start_session.dart';
 import 'package:kompas/features/conversation/providers/session_providers.dart';
 import 'package:kompas/features/profile/providers/profile_providers.dart';
+import 'package:kompas/features/notebook/providers/notebook_providers.dart';
 import 'package:kompas/l10n/kompas_l10n.dart';
 import 'package:kompas/navigation/app_routes.dart';
 import 'package:kompas/providers/voice_provider.dart';
@@ -111,8 +112,11 @@ class _CoachChatScreenState extends ConsumerState<CoachChatScreen> {
 
     if (!mounted) return;
     result.fold(
-      onSuccess: (_) {
+      onSuccess: (turn) {
         ref.invalidate(sessionMessagesProvider(session.id));
+        if (turn.savedNotebookWords.isNotEmpty) {
+          ref.invalidate(notebookItemsProvider);
+        }
         setState(() => _sending = false);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_scroll.hasClients) {
@@ -310,6 +314,7 @@ class _ComposerBar extends StatelessWidget {
             CompassSpacing.sm,
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                 child: TextField(
@@ -319,17 +324,29 @@ class _ComposerBar extends StatelessWidget {
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => onSend(),
                   enabled: !sending,
+                  style: Theme.of(context).textTheme.bodyLarge,
                   decoration: InputDecoration(
                     hintText: hint,
                     filled: true,
-                    fillColor: scheme.surfaceContainerHighest.withOpacity(0.5),
+                    fillColor: scheme.surfaceContainerHighest.withOpacity(0.55),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(CompassRadii.lg),
+                      borderRadius: BorderRadius.circular(CompassRadii.xl),
                       borderSide: BorderSide.none,
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(CompassRadii.xl),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(CompassRadii.xl),
+                      borderSide: BorderSide(
+                        color: scheme.primary.withOpacity(0.35),
+                        width: 1.5,
+                      ),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: CompassSpacing.md,
-                      vertical: CompassSpacing.sm,
+                      horizontal: CompassSpacing.lg,
+                      vertical: CompassSpacing.md,
                     ),
                   ),
                 ),
@@ -341,15 +358,39 @@ class _ComposerBar extends StatelessWidget {
                 onTextUpdated: (_) {},
                 onListeningStopped: onVoiceStopped,
               ),
-              IconButton.filled(
-                onPressed: sending ? null : onSend,
-                icon: sending
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.arrow_upward_rounded),
+              const SizedBox(width: CompassSpacing.xs),
+              Material(
+                color: sending
+                    ? scheme.primary.withOpacity(0.45)
+                    : scheme.primary,
+                shape: const CircleBorder(),
+                elevation: sending ? 0 : 2,
+                shadowColor: scheme.primary.withOpacity(0.4),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: sending ? null : onSend,
+                  customBorder: const CircleBorder(),
+                  child: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: Center(
+                      child: sending
+                          ? SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.4,
+                                color: scheme.onPrimary,
+                              ),
+                            )
+                          : Icon(
+                              Icons.arrow_upward_rounded,
+                              size: 28,
+                              color: scheme.onPrimary,
+                            ),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

@@ -73,7 +73,9 @@ abstract final class ModePromptCatalog {
       'Recycle useful Russian phrases, idioms, particles, and motion verbs.',
       'When relevant, contrast pairs like ехать/ездить, сказать/говорить.',
       'Remember provided memory and bring saved expressions back into talk.',
-      'Keep the topic coherent with today\'s goal.',
+      'When the learner asks to save a word/phrase to the notebook '
+          '(«добавь в блокнот», «запиши слово», voice or text), '
+          'create a full notebook entry with translation and 2 short Russian examples.',
     ],
     stopConditions: [
       'Stop expanding when the speaking target duration is reached.',
@@ -83,13 +85,16 @@ abstract final class ModePromptCatalog {
       'Prioritize continuous spoken Russian over perfect grammar.',
       'Correct only if meaning breaks or a priority skill needs it.',
       'Never switch away from Russian unless the learner asks.',
+      'For notebook saves, translation may be in the learner\'s native language '
+          '(often Uzbek or Russian gloss) while examples stay in Russian.',
     ],
     successCriteria: [
       'Learner produces multiple connected Russian turns.',
       'Learner uses at least one new expression or corrects a known weak point.',
     ],
     followUpStrategy:
-        'Close with one recycled Russian phrase for the notebook and a next-turn invitation.',
+        'If a notebook save was requested, confirm briefly after emitting the '
+        'machine save block. Otherwise close with one recycled phrase and a next question.',
   );
 
   static const _storytelling = ModePromptBlueprint(
